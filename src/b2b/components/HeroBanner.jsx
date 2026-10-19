@@ -20,46 +20,46 @@ export default function HeroBanner({ currentUser }) {
       <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
 
       {/* Banner Content Container */}
-      <div className="relative max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 pb-12 sm:pb-14 flex items-center justify-between gap-6">
+      <div className="relative max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10 pb-10 sm:pb-14 flex items-center justify-between gap-6">
         {/* Left Side: Avatar Circle & Partner Details */}
-        <div className="flex items-center gap-4 sm:gap-6">
+        <div className="flex items-center gap-3.5 sm:gap-6">
           {/* Avatar Circle with Thick White Border + Camera Badge */}
           <div className="relative shrink-0">
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-[#dbeafe] text-[#1e3a8a] font-extrabold text-2xl sm:text-3xl flex items-center justify-center shadow-2xl ring-4 ring-white tracking-tight">
+            <div className="w-16 h-16 xs:w-20 xs:h-20 sm:w-24 sm:h-24 rounded-full bg-[#dbeafe] text-[#1e3a8a] font-extrabold text-xl xs:text-2xl sm:text-3xl flex items-center justify-center shadow-2xl ring-3 sm:ring-4 ring-white tracking-tight">
               {partner.initials || 'AR'}
             </div>
             <button
               type="button"
-              className="absolute bottom-0 right-0 size-7 rounded-full bg-[#0d2b59] text-white flex items-center justify-center shadow-md ring-2 ring-white hover:bg-slate-800 transition-colors cursor-pointer"
+              className="absolute bottom-0 right-0 size-6 sm:size-7 rounded-full bg-[#0d2b59] text-white flex items-center justify-center shadow-md ring-2 ring-white hover:bg-slate-800 transition-colors cursor-pointer"
               title="Change profile picture"
             >
-              <Camera className="size-3.5" />
+              <Camera className="size-3 sm:size-3.5" />
             </button>
           </div>
 
           {/* Welcome Text & Partner Details */}
           <div className="text-white space-y-0.5 sm:space-y-1">
-            <span className="text-xs sm:text-[13px] font-normal text-white/90 tracking-wide block">
+            <span className="text-[11px] sm:text-[13px] font-normal text-white/90 tracking-wide block">
               Welcome Back,
             </span>
 
             {/* Name + B2B Partner Badge on the same line */}
-            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-              <h1 className="text-2xl sm:text-[28px] lg:text-3xl font-extrabold text-white tracking-tight drop-shadow-md leading-tight">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-3">
+              <h1 className="text-xl xs:text-2xl sm:text-[28px] lg:text-3xl font-extrabold text-white tracking-tight drop-shadow-md leading-tight">
                 {partner.name || 'Abdul Rahman'}
               </h1>
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-semibold bg-[#1d7bf2] text-white shadow-xs">
+              <span className="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-md text-[10px] sm:text-xs font-semibold bg-[#1d7bf2] text-white shadow-xs">
                 B2B Partner
               </span>
             </div>
 
             {/* Partner ID */}
-            <p className="text-xs sm:text-[13px] text-white/95 font-medium tracking-wide">
+            <p className="text-[11px] sm:text-[13px] text-white/95 font-medium tracking-wide">
               Partner ID: {partner.partnerId || 'PRT-2025-00124'}
             </p>
 
             {/* Agency Trust subhead */}
-            <p className="text-[11px] sm:text-xs text-white/80 font-normal">
+            <p className="text-[10px] sm:text-xs text-white/80 font-normal">
               ABL Travels Trusted Partner Since 2024
             </p>
           </div>

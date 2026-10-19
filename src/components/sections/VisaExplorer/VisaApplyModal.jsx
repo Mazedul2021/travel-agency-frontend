@@ -434,20 +434,20 @@ export default function VisaApplyModal({
         aria-hidden="true"
       />
 
-      {/* Main Modal Card: Larger and more spacious square layout, fits comfortably in one page */}
-      <div className="relative w-full max-w-[1240px] xl:max-w-[1280px] bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden my-auto h-[95vh] max-h-[920px] min-h-[760px] flex flex-col md:flex-row transition-all duration-300">
+      {/* Main Modal Card: Fully responsive across mobile, tablet, and desktop */}
+      <div className="relative w-full max-w-[1240px] xl:max-w-[1280px] bg-white rounded-2xl shadow-2xl border border-slate-100 my-auto flex flex-col md:flex-row max-h-[94vh] md:h-[92vh] md:max-h-[920px] overflow-y-auto md:overflow-hidden transition-all duration-300">
         {/* ======================================================== */}
         {/* SUCCESS CONFIRMATION STATE                               */}
         {/* ======================================================== */}
         {isSubmitted ? (
-          <div className="w-full p-8 sm:p-12 flex flex-col items-center justify-center text-center bg-white min-h-[480px]">
-            <div className="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 ring-8 ring-emerald-50/60">
-              <CheckCircle2 className="w-10 h-10" />
+          <div className="w-full p-6 sm:p-10 md:p-12 flex flex-col items-center justify-center text-center bg-white min-h-[380px] sm:min-h-[440px]">
+            <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mb-4 ring-8 ring-emerald-50/60">
+              <CheckCircle2 className="w-8 h-8 sm:w-10 sm:h-10" />
             </div>
-            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 tracking-tight">
               Application Submitted Successfully!
             </h2>
-            <p className="mt-2 text-xs sm:text-sm text-slate-500 max-w-md">
+            <p className="mt-2 text-xs sm:text-sm text-slate-500 max-w-md px-2">
               Thank you for applying for the <strong className="text-slate-800">{countryName} {visaTypeLabel}</strong>. Our senior visa processing team has received your application and documents.
             </p>
 
@@ -487,28 +487,28 @@ export default function VisaApplyModal({
             {/* ======================================================== */}
             {/* LEFT COLUMN: VISA SUMMARY, PRICING & TERMS               */}
             {/* ======================================================== */}
-            <div className="w-full md:w-[335px] lg:w-[355px] shrink-0 p-5 sm:p-5.5 bg-white border-b md:border-b-0 md:border-r border-slate-100 flex flex-col gap-3.5 sm:gap-4 overflow-hidden justify-between">
+            <div className="w-full md:w-[330px] lg:w-[355px] shrink-0 p-4 sm:p-5 lg:p-5.5 bg-white border-b md:border-b-0 md:border-r border-slate-100 flex flex-col gap-3 sm:gap-4 md:overflow-y-auto justify-between">
               {/* 1. Country & Visa Hero Banner Image */}
-              <div className="relative h-48 sm:h-52 rounded-2xl overflow-hidden shadow-xs border border-slate-100 shrink-0">
+              <div className="relative h-36 sm:h-44 md:h-48 lg:h-52 rounded-2xl overflow-hidden shadow-xs border border-slate-100 shrink-0">
                 <img
                   src={heroImage}
                   alt={`${countryName} Visa`}
                   className="w-full h-full object-cover object-center"
                 />
                 {/* Dark gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 via-35% to-transparent flex items-end p-4">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 via-35% to-transparent flex items-end p-3.5 sm:p-4">
                   <div className="flex items-center gap-2.5">
                     <CountryFlag
                       code={country.code}
                       name={countryName}
-                      width={42}
+                      width={38}
                       className="rounded-xs shadow-md border border-white/20"
                     />
                     <div className="text-white leading-tight">
-                      <h4 className="font-bold text-lg sm:text-xl tracking-tight text-white drop-shadow-xs">
+                      <h4 className="font-bold text-base sm:text-lg md:text-xl tracking-tight text-white drop-shadow-xs">
                         {countryName}
                       </h4>
-                      <p className="font-bold text-lg sm:text-xl tracking-tight text-white drop-shadow-xs">
+                      <p className="font-bold text-base sm:text-lg md:text-xl tracking-tight text-white drop-shadow-xs">
                         {visaTypeLabel}
                       </p>
                     </div>
@@ -516,38 +516,41 @@ export default function VisaApplyModal({
                 </div>
               </div>
 
-              {/* 2. Processing Time Card */}
-              <div className="p-3.5 sm:p-4 rounded-xl bg-[#f0f6ff] border border-blue-100/60 flex items-center gap-3.5 shrink-0">
-                <div className="w-9 h-9 rounded-full bg-blue-100/70 text-blue-600 flex items-center justify-center shrink-0">
-                  <Clock className="w-5 h-5" strokeWidth={2} />
+              {/* 2 & 3. Processing Time & Visa Fee Cards (2-col on mobile, stacked on desktop) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-1 gap-2.5 sm:gap-3 shrink-0">
+                {/* Processing Time Card */}
+                <div className="p-3 sm:p-3.5 md:p-4 rounded-xl bg-[#f0f6ff] border border-blue-100/60 flex items-center gap-3 shrink-0">
+                  <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-blue-100/70 text-blue-600 flex items-center justify-center shrink-0">
+                    <Clock className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2} />
+                  </div>
+                  <div>
+                    <p className="text-[11px] sm:text-xs font-medium text-slate-500 leading-none">
+                      Processing Time
+                    </p>
+                    <p className="mt-1 text-xs sm:text-sm md:text-base font-bold text-slate-900 leading-tight">
+                      {facts?.processing || '15 Days (+/-)'}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <p className="text-xs font-medium text-slate-500 leading-none">
-                    Processing Time
+
+                {/* Visa Fee Card */}
+                <div className="p-3 sm:p-3.5 md:p-4 rounded-xl bg-[#f0f6ff] border border-blue-100/60 shrink-0">
+                  <p className="text-[11px] sm:text-xs font-medium text-slate-500 leading-none">
+                    Visa Fee (Individual - B2C)
                   </p>
-                  <p className="mt-1 text-sm sm:text-base font-bold text-slate-900 leading-tight">
-                    {facts?.processing || '15 Days (+/-)'}
-                  </p>
+                  <div className="mt-1 flex items-center justify-between gap-1.5">
+                    <span className="text-lg sm:text-xl md:text-2xl lg:text-[27px] font-black text-[#0f2942] tracking-tight">
+                      {feeAmount}
+                    </span>
+                    <span className="text-[10px] sm:text-xs font-bold text-blue-600 bg-white border border-blue-200 px-2 py-0.5 rounded-md shadow-2xs whitespace-nowrap">
+                      {feeNote}
+                    </span>
+                  </div>
                 </div>
               </div>
 
-              {/* 3. Visa Fee Card */}
-              <div className="p-3.5 sm:p-4 rounded-xl bg-[#f0f6ff] border border-blue-100/60 shrink-0">
-                <p className="text-xs font-medium text-slate-500 leading-none">
-                  Visa Fee (Individual - B2C)
-                </p>
-                <div className="mt-1 flex items-center justify-between gap-2">
-                  <span className="text-2xl sm:text-[27px] font-black text-[#0f2942] tracking-tight">
-                    {feeAmount}
-                  </span>
-                  <span className="text-xs font-bold text-blue-600 bg-white border border-blue-200 px-2.5 py-0.5 rounded-md shadow-2xs">
-                    {feeNote}
-                  </span>
-                </div>
-              </div>
-
-              {/* 4. Important Note Card with Scenic Background Image filling remaining height */}
-              <div className="flex-1 min-h-[235px] rounded-2xl bg-[#f0f6ff]/80 border border-blue-100/80 p-4 sm:p-4.5 relative overflow-hidden flex flex-col justify-between shadow-2xs">
+              {/* 4. Important Note Card with Scenic Background Image */}
+              <div className="rounded-2xl bg-[#f0f6ff]/80 border border-blue-100/80 p-3.5 sm:p-4 md:p-4.5 relative overflow-hidden flex flex-col justify-between shadow-2xs min-h-0 md:min-h-[220px]">
                 {/* Great Wall Scenic Background Image */}
                 <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-2xl">
                   <img
@@ -566,7 +569,7 @@ export default function VisaApplyModal({
                     </div>
                     <span className="text-xs sm:text-sm font-bold text-slate-900">Important Note</span>
                   </div>
-                  <ul className="list-disc pl-4 space-y-1.5 text-slate-700 text-xs sm:text-[12.5px] leading-relaxed marker:text-slate-500 font-normal">
+                  <ul className="list-disc pl-4 space-y-1 sm:space-y-1.5 text-slate-700 text-[11px] sm:text-xs md:text-[12.5px] leading-relaxed marker:text-slate-500 font-normal">
                     <li>Visa fee is non-refundable.</li>
                     <li>Visa approval is at the sole discretion of the Embassy.</li>
                     <li>Please provide authentic and complete documents.</li>
@@ -580,23 +583,23 @@ export default function VisaApplyModal({
             {/* ======================================================== */}
             {/* RIGHT COLUMN: APPLICATION FORM & UPLOAD DOCUMENTS        */}
             {/* ======================================================== */}
-            <div className="flex-1 p-5 sm:p-6 lg:p-7 bg-white relative flex flex-col justify-between overflow-hidden">
+            <div className="flex-1 p-4 sm:p-6 lg:p-7 bg-white relative flex flex-col justify-between md:overflow-y-auto">
               {/* Close Button */}
               <button
                 type="button"
                 onClick={onClose}
-                className="absolute top-4 right-4 sm:top-5 sm:right-5 p-1.5 rounded-full text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition cursor-pointer z-20"
+                className="absolute top-3 right-3 sm:top-4 sm:right-5 p-2 rounded-full text-slate-400 hover:text-slate-700 bg-white/90 md:bg-transparent hover:bg-slate-100 shadow-xs md:shadow-none transition cursor-pointer z-30"
                 aria-label="Close modal"
               >
                 <X className="w-5 h-5" />
               </button>
 
-              <form onSubmit={handleSubmit} className="h-full flex flex-col justify-between space-y-3 sm:space-y-3.5">
+              <form onSubmit={handleSubmit} className="flex-1 flex flex-col justify-between space-y-3.5 sm:space-y-4">
                 {/* Top Header */}
-                <div className="pr-8">
+                <div className="pr-8 sm:pr-10">
                   <h2
                     id="visa-modal-title"
-                    className="text-2xl sm:text-[26px] font-black text-slate-900 tracking-tight leading-tight"
+                    className="text-xl sm:text-2xl md:text-[26px] font-black text-slate-900 tracking-tight leading-tight"
                   >
                     Apply for {countryName} {visaTypeLabel}
                   </h2>
@@ -605,10 +608,10 @@ export default function VisaApplyModal({
                   </p>
                 </div>
 
-                {/* 1. Personal Information Input Grid (Larger and more spacious) */}
-                <div className="space-y-2.5">
+                {/* 1. Personal Information Input Grid */}
+                <div className="space-y-2.5 sm:space-y-3">
                   {/* Row 1: Given Name & Surname */}
-                  <div className="grid grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
                     <div>
                       <label className="block text-xs sm:text-[13px] font-semibold text-slate-700 mb-1">
                         Given Name (First Name) <span className="text-red-500">*</span>
@@ -647,7 +650,7 @@ export default function VisaApplyModal({
                   </div>
 
                   {/* Row 2: Passport Number & Contact Number */}
-                  <div className="grid grid-cols-2 gap-3.5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
                     <div>
                       <label className="block text-xs sm:text-[13px] font-semibold text-slate-700 mb-1">
                         Passport Number <span className="text-red-500">*</span>
@@ -675,7 +678,7 @@ export default function VisaApplyModal({
                           <button
                             type="button"
                             onClick={() => setShowDialDropdown(!showDialDropdown)}
-                            className="flex items-center gap-1.5 px-3 h-10 sm:h-11 rounded-l-xl border border-r-0 border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-100 transition cursor-pointer"
+                            className="flex items-center gap-1.5 px-2.5 sm:px-3 h-10 sm:h-11 rounded-l-xl border border-r-0 border-slate-200 bg-slate-50 text-xs sm:text-sm font-medium text-slate-700 hover:bg-slate-100 transition cursor-pointer shrink-0"
                           >
                             <CountryFlag code={selectedDialInfo.code} name="" width={18} className="rounded-2xs" />
                             <span>{formData.countryDialCode}</span>
@@ -708,7 +711,7 @@ export default function VisaApplyModal({
                           value={formData.contactNumber}
                           onChange={(e) => handleInputChange('contactNumber', e.target.value)}
                           placeholder="Enter contact number"
-                          className={`flex-1 h-10 sm:h-11 px-3 rounded-r-xl border ${
+                          className={`flex-1 min-w-0 h-10 sm:h-11 px-3 rounded-r-xl border ${
                             errors.contactNumber ? 'border-red-400 bg-red-50/20' : 'border-slate-200 bg-white'
                           } text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition`}
                         />
@@ -737,20 +740,20 @@ export default function VisaApplyModal({
                 </div>
 
                 {/* ======================================================== */}
-                {/* 2. UPLOAD DOCUMENTS SECTION (EXACT DESIGN MATCH)         */}
+                {/* 2. UPLOAD DOCUMENTS SECTION (RESPONSIVE GRID)            */}
                 {/* ======================================================== */}
                 <div>
-                  <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-1.5 sm:mb-2">
                     <h3 className="text-xs sm:text-sm font-bold text-slate-900">
                       Upload Documents
                     </h3>
-                    <span className="text-[11px] sm:text-xs text-slate-400 font-medium">
+                    <span className="text-[10.5px] sm:text-xs text-slate-400 font-medium">
                       Accepted formats: JPG, PNG, PDF (Max 5MB each)
                     </span>
                   </div>
 
-                  {/* 10 Cards in 2 rows of 5 with inner dashed box & left-aligned titles (Larger size) */}
-                  <div className="grid grid-cols-5 gap-2.5 sm:gap-3">
+                  {/* Responsive grid: 2 cols on mobile, 3 on sm/md, 4 on lg, 5 on xl */}
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-2.5 lg:gap-3">
                     {DOCUMENT_FIELDS.map((doc) => {
                       const fileInfo = uploadedFiles[doc.id]
                       const isDragged = dragActiveId === doc.id
@@ -758,10 +761,10 @@ export default function VisaApplyModal({
                       return (
                         <div
                           key={doc.id}
-                          className="rounded-xl border border-slate-200/90 bg-white p-2.5 sm:p-3 flex flex-col justify-between shadow-2xs hover:border-blue-300 transition"
+                          className="rounded-xl border border-slate-200/90 bg-white p-2 sm:p-2.5 flex flex-col justify-between shadow-2xs hover:border-blue-300 transition"
                         >
                           {/* Left-aligned top label */}
-                          <p className="text-xs sm:text-[12.5px] font-semibold text-slate-800 leading-tight truncate px-0.5 pt-0.5">
+                          <p className="text-[11px] sm:text-xs font-semibold text-slate-800 leading-tight truncate px-0.5 pt-0.5" title={doc.title}>
                             {doc.title.includes('*') ? (
                               <>
                                 {doc.title.replace('*', '').trim()}
@@ -781,19 +784,19 @@ export default function VisaApplyModal({
                             className="hidden"
                           />
 
-                          {/* Inner Dashed Box (Larger and spacious matching reference image) */}
+                          {/* Inner Dashed Box */}
                           <div
                             onClick={() => fileInputRefs.current[doc.id]?.click()}
                             onDragOver={(e) => handleDragOver(e, doc.id)}
                             onDragLeave={(e) => handleDragLeave(e, doc.id)}
                             onDrop={(e) => handleDrop(e, doc.id)}
-                            className={`mt-2 rounded-xl border border-dashed ${
+                            className={`mt-1.5 sm:mt-2 rounded-xl border border-dashed ${
                               fileInfo
                                 ? 'border-blue-400 bg-blue-50/30'
                                 : isDragged
                                 ? 'border-blue-500 bg-blue-50/50 ring-2 ring-blue-300'
                                 : 'border-blue-200/90 bg-[#fbfdff] hover:bg-blue-50/40 hover:border-blue-400'
-                            } py-2.5 sm:py-3 px-1.5 flex flex-col items-center justify-center text-center cursor-pointer transition min-h-[88px] sm:min-h-[94px] group`}
+                            } py-2 sm:py-2.5 px-1 sm:px-1.5 flex flex-col items-center justify-center text-center cursor-pointer transition min-h-[82px] sm:min-h-[92px] group`}
                           >
                             {fileInfo ? (
                               <div className="flex flex-col items-center w-full px-1">
@@ -814,14 +817,14 @@ export default function VisaApplyModal({
                               </div>
                             ) : (
                               <>
-                                <div className="mb-1.5 group-hover:scale-105 transition-transform">
-                                  <DocumentIcon id={doc.id} className="w-7 h-7 text-[#1877f2]" />
+                                <div className="mb-1 group-hover:scale-105 transition-transform">
+                                  <DocumentIcon id={doc.id} className="w-5 h-5 sm:w-6 sm:h-6 md:w-7 md:h-7 text-[#1877f2]" />
                                 </div>
-                                <p className="text-[11px] sm:text-xs font-bold text-[#1877f2] leading-tight hover:underline">
+                                <p className="text-[10.5px] sm:text-xs font-bold text-[#1877f2] leading-tight hover:underline">
                                   Click to upload
                                 </p>
-                                <p className="text-[9.5px] sm:text-[10px] text-slate-400 leading-tight">or drag &amp; drop</p>
-                                <p className="text-[8.5px] sm:text-[9px] text-slate-400 font-medium uppercase mt-0.5 tracking-wider leading-tight">
+                                <p className="text-[9px] sm:text-[9.5px] text-slate-400 leading-tight">or drag &amp; drop</p>
+                                <p className="text-[8px] sm:text-[8.5px] text-slate-400 font-medium uppercase mt-0.5 tracking-wider leading-tight">
                                   {doc.formats}
                                 </p>
                               </>
@@ -846,8 +849,8 @@ export default function VisaApplyModal({
                     </span>
                   </div>
 
-                  {/* Radio Choice Cards */}
-                  <div className="grid grid-cols-2 gap-3.5">
+                  {/* Radio Choice Cards (1-col on mobile, 2-col on sm+) */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5">
                     {/* Option 1: Pickup Request */}
                     <div
                       onClick={() => handleInputChange('submissionMethod', 'pickup')}
@@ -910,7 +913,7 @@ export default function VisaApplyModal({
                   </div>
 
                   {/* Pickup Address & Office Address Row */}
-                  <div className="grid grid-cols-2 gap-3.5 mt-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3.5 mt-2">
                     <div>
                       <div className="relative">
                         <MapPin className="absolute left-3 top-3 w-4 h-4 text-slate-400 pointer-events-none" />
@@ -926,7 +929,7 @@ export default function VisaApplyModal({
                       </div>
                     </div>
 
-                    <div className="p-2.5 sm:p-3 rounded-xl bg-[#f0f6ff] border border-blue-100 flex items-center gap-3 h-11 sm:h-12">
+                    <div className="p-2.5 sm:p-3 rounded-xl bg-[#f0f6ff] border border-blue-100 flex items-center gap-3 min-h-[44px] sm:h-12">
                       <div className="w-7 h-7 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
                         <MapPin className="w-4 h-4" />
                       </div>
@@ -941,13 +944,13 @@ export default function VisaApplyModal({
                 </div>
 
                 {/* ======================================================== */}
-                {/* 4. FOOTER ACTION BUTTONS                                 */}
+                {/* 4. FOOTER ACTION BUTTONS (STICKY ON MOBILE)              */}
                 {/* ======================================================== */}
-                <div className="flex items-center justify-end gap-3 pt-3 border-t border-slate-100 mt-1">
+                <div className="sticky bottom-0 -mx-4 -mb-4 sm:-mx-6 sm:-mb-6 lg:-mx-7 lg:-mb-7 px-4 py-3 sm:px-6 sm:py-3.5 lg:px-7 bg-white/95 backdrop-blur-sm border-t border-slate-100 flex items-center justify-end gap-2.5 sm:gap-3 mt-3 sm:mt-4 z-20">
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-6 sm:px-7 py-2.5 sm:py-3 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition cursor-pointer active:scale-95"
+                    className="flex-1 sm:flex-initial px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl border border-slate-300 text-xs sm:text-sm font-semibold text-slate-700 bg-white hover:bg-slate-50 transition cursor-pointer active:scale-95 text-center"
                   >
                     Cancel
                   </button>
@@ -955,7 +958,7 @@ export default function VisaApplyModal({
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    className="px-7 sm:px-8 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#006ce4] hover:bg-[#0057b8] shadow-sm flex items-center gap-2 transition cursor-pointer active:scale-95 disabled:opacity-60"
+                    className="flex-1 sm:flex-initial px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#006ce4] hover:bg-[#0057b8] shadow-sm flex items-center justify-center gap-2 transition cursor-pointer active:scale-95 disabled:opacity-60"
                   >
                     {isSubmitting ? (
                       <span>Submitting...</span>

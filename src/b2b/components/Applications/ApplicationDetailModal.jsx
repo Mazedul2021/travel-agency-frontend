@@ -30,19 +30,19 @@ export default function ApplicationDetailModal({ application, onClose }) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-900/60 backdrop-blur-xs animate-fade-in">
       <div className="relative w-full max-w-2xl bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden max-h-[92vh] flex flex-col">
         {/* Header */}
-        <div className="bg-[#0d2b59] px-5 sm:px-6 py-4 flex items-center justify-between text-white shrink-0">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
-              <CountryFlag countryCode={application.countryCode} countryName={application.country} className="w-6 h-5" />
+        <div className="bg-[#0d2b59] px-4 sm:px-6 py-3.5 sm:py-4 flex items-center justify-between text-white shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-white/10 flex items-center justify-center shrink-0">
+              <CountryFlag countryCode={application.countryCode} countryName={application.country} className="w-5 h-4 sm:w-6 sm:h-5" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
                 <h3 className="text-sm sm:text-base font-bold text-white">{application.applicantName}</h3>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold bg-white/20 text-white`}>
                   {application.status}
                 </span>
               </div>
-              <p className="text-[11px] sm:text-xs text-white/70">
+              <p className="text-[10px] sm:text-xs text-white/70">
                 {application.country} • {application.applicationType} • Ref: {application.appRef}
               </p>
             </div>
@@ -56,9 +56,9 @@ export default function ApplicationDetailModal({ application, onClose }) {
         </div>
 
         {/* Scrollable Body */}
-        <div className="p-4 sm:p-6 space-y-5 sm:space-y-6 overflow-y-auto">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6 overflow-y-auto">
           {/* Key Metric Summary */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-3">
               <span className="text-[11px] text-slate-500 block">Passport Number</span>
               <div className="flex items-center gap-1.5 mt-0.5">
@@ -141,7 +141,7 @@ export default function ApplicationDetailModal({ application, onClose }) {
         </div>
 
         {/* Footer */}
-        <div className="bg-slate-50 border-t border-slate-200 px-6 py-3 flex items-center justify-between shrink-0">
+        <div className="bg-slate-50 border-t border-slate-200 px-4 sm:px-6 py-3 flex flex-wrap items-center justify-between gap-2 shrink-0">
           <button
             onClick={() => window.print()}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-200/60 rounded-lg transition-colors cursor-pointer"
@@ -152,13 +152,13 @@ export default function ApplicationDetailModal({ application, onClose }) {
           <div className="flex items-center gap-2">
             <button
               onClick={onClose}
-              className="px-4 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-200/60 rounded-lg transition-colors cursor-pointer"
+              className="px-3.5 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-200/60 rounded-lg transition-colors cursor-pointer"
             >
               Close
             </button>
             <button
               onClick={() => alert(`Downloading visa dossier for ${application.applicantName}`)}
-              className="inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold text-white bg-[#0d2b59] hover:bg-[#071933] rounded-lg shadow-xs transition-colors cursor-pointer"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-semibold text-white bg-[#0d2b59] hover:bg-[#071933] rounded-lg shadow-xs transition-colors cursor-pointer"
             >
               <Download className="w-3.5 h-3.5" />
               <span>Download Voucher</span>

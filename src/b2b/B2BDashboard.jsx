@@ -36,7 +36,7 @@ export default function B2BDashboard({
   const [isReportModalOpen, setIsReportModalOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-[#f4f7fb] text-slate-800 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#f4f7fb] text-slate-800 flex flex-col font-sans w-full max-w-full overflow-x-hidden">
       {/* 1. Global Navigation Bar - Unified Storefront Header */}
       <Header
         isDashboardView={true}
@@ -49,15 +49,17 @@ export default function B2BDashboard({
       <HeroBanner activeTab={activeTab} currentUser={currentUser} />
 
       {/* 3. Floating 5-Tab Dashboard Navigation Bar */}
-      <DashboardTabs
-        activeTab={activeTab}
-        onTabChange={(tab) => {
-          setActiveTab(tab)
-        }}
-      />
+      <div className="w-full max-w-full min-w-0">
+        <DashboardTabs
+          activeTab={activeTab}
+          onTabChange={(tab) => {
+            setActiveTab(tab)
+          }}
+        />
+      </div>
 
       {/* 4. Main Page Body Container */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-3 sm:px-6 lg:px-8 py-6 sm:py-10">
         {activeTab === 'profile' && (
           <div className="animate-fade-in">
             <ProfileView
@@ -107,11 +109,11 @@ export default function B2BDashboard({
       </main>
 
       {/* 5. Rich Dark Navy Footer Matching Reference Screenshot */}
-      <footer className="bg-[#071933] text-white border-t border-slate-800/80 pt-12 pb-8 mt-12">
+      <footer className="bg-[#071933] text-white border-t border-slate-800/80 pt-10 sm:pt-12 pb-8 mt-10 sm:mt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-8 pb-10 border-b border-white/10 text-xs">
+          <div className="grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 sm:gap-8 pb-8 sm:pb-10 border-b border-white/10 text-xs">
             {/* Col 1: Brand Info */}
-            <div className="col-span-2 md:col-span-1 lg:col-span-1 space-y-3">
+            <div className="col-span-1 xs:col-span-2 md:col-span-1 lg:col-span-1 space-y-3">
               <div className="flex items-center gap-2">
                 <svg
                   viewBox="0 0 120 100"
@@ -179,7 +181,7 @@ export default function B2BDashboard({
             </div>
 
             {/* Col 5: Contact Us */}
-            <div className="col-span-2 md:col-span-1 lg:col-span-1">
+            <div className="col-span-1 xs:col-span-2 md:col-span-1 lg:col-span-1">
               <h5 className="font-bold text-white text-[13px] mb-3">Contact Us</h5>
               <ul className="space-y-2.5 text-white/75 text-[11px] leading-relaxed">
                 <li className="flex items-start gap-2">

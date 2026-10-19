@@ -34,9 +34,9 @@ export default function PickupDetailModal({ pickup, onClose }) {
         <div className="p-4 sm:p-6 space-y-5 overflow-y-auto">
           {/* Dispatch Rider Card */}
           {pickup.assignedRider ? (
-            <div className="bg-blue-50/80 border border-blue-100 rounded-xl p-4 flex items-center justify-between">
+            <div className="bg-blue-50/80 border border-blue-100 rounded-xl p-3.5 sm:p-4 flex flex-col xs:flex-row items-start xs:items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#0066cc] text-white font-bold flex items-center justify-center text-sm">
+                <div className="w-10 h-10 rounded-full bg-[#0066cc] text-white font-bold flex items-center justify-center text-sm shrink-0">
                   {pickup.assignedRider.name.slice(0, 2).toUpperCase()}
                 </div>
                 <div>
@@ -46,7 +46,7 @@ export default function PickupDetailModal({ pickup, onClose }) {
               </div>
               <a
                 href={`tel:${pickup.assignedRider.phone}`}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0066cc] hover:bg-[#004f9e] text-white rounded-lg text-xs font-semibold transition-colors"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0066cc] hover:bg-[#004f9e] text-white rounded-lg text-xs font-semibold transition-colors shrink-0"
               >
                 <Phone className="w-3.5 h-3.5" />
                 <span>Call Courier</span>
@@ -59,7 +59,7 @@ export default function PickupDetailModal({ pickup, onClose }) {
           )}
 
           {/* Location & Time */}
-          <div className="grid grid-cols-2 gap-3 text-xs">
+          <div className="grid grid-cols-1 xs:grid-cols-2 gap-3 text-xs">
             <div className="bg-slate-50 border border-slate-100 rounded-xl p-3">
               <span className="text-slate-400 block mb-1">Pickup Date &amp; Slot</span>
               <p className="font-semibold text-slate-800">{pickup.requestedDate}</p>

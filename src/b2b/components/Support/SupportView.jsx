@@ -131,7 +131,7 @@ export default function SupportView() {
 
         {/* Right Column: Ticket Submission (5 cols) */}
         <div className="lg:col-span-5">
-          <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs space-y-4">
+          <div className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-6 shadow-xs space-y-4">
             <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
               <Send className="w-4 h-4 text-[#0066cc]" />
               <h3 className="text-sm font-bold text-slate-800">Submit Priority Ticket</h3>

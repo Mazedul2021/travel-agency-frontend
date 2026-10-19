@@ -1,10 +1,7 @@
-import { useState } from 'react'
 import {
   Phone,
   Mail,
   Globe,
-  Printer,
-  Download,
   Check,
 } from 'lucide-react'
 import { COMMISSION_INVOICE_DEFAULT } from '../../data/commissionData'
@@ -143,7 +140,7 @@ export default function CommissionVoucherDocument({
   return (
     <div
       id="printable-voucher"
-      className="bg-white text-slate-800 font-sans max-w-[850px] mx-auto p-6 sm:p-8 md:p-10 shadow-xl rounded-2xl border border-slate-200 print:shadow-none print:border-none print:p-8 print:max-w-none print:rounded-none relative overflow-hidden"
+      className="bg-white text-slate-800 font-sans max-w-[850px] mx-auto p-4 sm:p-8 md:p-10 shadow-xl rounded-2xl border border-slate-200 print:shadow-none print:border-none print:p-8 print:max-w-none print:rounded-none relative overflow-hidden"
     >
       {/* Thin Dark Top Page Accent Border */}
       <div className="absolute top-0 left-0 right-0 h-1 bg-[#0d2b59]" />
@@ -303,7 +300,7 @@ export default function CommissionVoucherDocument({
       {/* ======================================================== */}
       <div className="mt-3">
         <div className="overflow-x-auto rounded-lg border border-slate-200">
-          <table className="w-full text-left border-collapse text-xs">
+          <table className="w-full min-w-[620px] text-left border-collapse text-xs">
             <thead>
               <tr className="bg-[#0d2b59] text-white divide-x divide-white/20">
                 <th className="py-2.5 px-3 font-semibold text-center w-10">#</th>
@@ -404,7 +401,7 @@ export default function CommissionVoucherDocument({
       {/* ======================================================== */}
       {/* 5. TERMS & NOTES (LEFT) + SIGNATURE & RUBBER STAMP (RIGHT) */}
       {/* ======================================================== */}
-      <div className="mt-7 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-end justify-between gap-6">
+      <div className="mt-7 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-6">
         {/* Left Terms & Notes */}
         <div className="space-y-1.5 text-[11px] sm:text-xs text-slate-600 max-w-md">
           <h4 className="font-bold text-[#0c1a30] text-xs sm:text-[13px]">
@@ -427,7 +424,7 @@ export default function CommissionVoucherDocument({
         </div>
 
         {/* Right Authorised Signature & Circular Rubber Stamp */}
-        <div className="relative flex items-center justify-end gap-2 self-end pr-2">
+        <div className="relative flex items-center justify-end gap-2 self-start sm:self-end pr-2">
           {/* Signature and Title */}
           <div className="text-center space-y-1 z-10">
             <CursiveSignature />

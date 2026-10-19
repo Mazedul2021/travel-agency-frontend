@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   Clock,
   DollarSign,
+  LogOut,
 } from 'lucide-react'
 import Logo from './common/Logo'
 import { PARTNER_INFO, TOP_NAV_ITEMS } from '../data/partnerData'

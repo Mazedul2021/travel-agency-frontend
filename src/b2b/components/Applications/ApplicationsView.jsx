@@ -245,9 +245,9 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
 
       {/* Filter & Search Bar */}
       <div className="bg-white rounded-xl border border-slate-200 p-3 sm:p-4 shadow-xs">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-center">
           {/* Search Input */}
-          <div className="md:col-span-5 relative">
+          <div className="col-span-1 sm:col-span-2 md:col-span-5 relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
               type="text"
@@ -259,7 +259,7 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
           </div>
 
           {/* Application Type Dropdown */}
-          <div className="md:col-span-2 relative">
+          <div className="col-span-1 sm:col-span-1 md:col-span-2 relative">
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
@@ -275,7 +275,7 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
           </div>
 
           {/* Country Dropdown */}
-          <div className="md:col-span-2 relative">
+          <div className="col-span-1 sm:col-span-1 md:col-span-2 relative">
             <select
               value={selectedCountry}
               onChange={(e) => setSelectedCountry(e.target.value)}
@@ -295,7 +295,7 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
           </div>
 
           {/* Date Range Dropdown */}
-          <div className="md:col-span-2 relative">
+          <div className="col-span-1 sm:col-span-1 md:col-span-2 relative">
             <select
               value={selectedDateRange}
               onChange={(e) => setSelectedDateRange(e.target.value)}
@@ -311,7 +311,7 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
           </div>
 
           {/* Reset Button */}
-          <div className="md:col-span-1 flex justify-end">
+          <div className="col-span-1 sm:col-span-1 md:col-span-1 flex justify-start sm:justify-end">
             <button
               onClick={handleReset}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-medium text-slate-600 hover:text-[#0066cc] hover:bg-slate-100 rounded-lg transition-colors cursor-pointer"
@@ -489,19 +489,19 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
         </div>
 
         {/* Table Footer with Pagination matching Image 1 */}
-        <div className="bg-white border-t border-slate-200 px-4 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm text-slate-600">
-          <div>
+        <div className="bg-white border-t border-slate-200 px-3 py-3 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm text-slate-600">
+          <div className="text-center sm:text-left">
             Showing <span className="font-semibold text-slate-800">1</span> to{' '}
             <span className="font-semibold text-slate-800">{filteredApplications.length}</span> of{' '}
             <span className="font-semibold text-slate-800">68</span> applications
           </div>
 
-          <div className="flex items-center gap-1 self-center sm:self-auto">
+          <div className="flex items-center justify-center gap-1 self-center sm:self-auto flex-wrap">
             {/* Prev Button */}
             <button
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
-              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none cursor-pointer"
+              className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 disabled:opacity-40 disabled:pointer-events-none cursor-pointer text-xs"
             >
               &lt;
             </button>
@@ -509,7 +509,7 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
             {/* Page 1 (Active) */}
             <button
               onClick={() => setCurrentPage(1)}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold cursor-pointer ${
+              className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs font-semibold cursor-pointer ${
                 currentPage === 1
                   ? 'bg-[#0d2b59] text-white'
                   : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -521,7 +521,7 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
             {/* Page 2 */}
             <button
               onClick={() => setCurrentPage(2)}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold cursor-pointer ${
+              className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs font-semibold cursor-pointer ${
                 currentPage === 2
                   ? 'bg-[#0d2b59] text-white'
                   : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -533,7 +533,7 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
             {/* Page 3 */}
             <button
               onClick={() => setCurrentPage(3)}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold cursor-pointer ${
+              className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-xs font-semibold cursor-pointer ${
                 currentPage === 3
                   ? 'bg-[#0d2b59] text-white'
                   : 'border border-slate-200 text-slate-600 hover:bg-slate-50'
@@ -543,14 +543,14 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
             </button>
 
             {/* Ellipsis */}
-            <span className="w-8 h-8 flex items-center justify-center text-slate-400">
+            <span className="w-6 sm:w-8 h-7 sm:h-8 flex items-center justify-center text-slate-400 text-xs">
               ...
             </span>
 
             {/* Page 9 */}
             <button
               onClick={() => setCurrentPage(9)}
-              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
+              className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 text-xs font-semibold cursor-pointer"
             >
               9
             </button>
@@ -558,7 +558,7 @@ export default function ApplicationsView({ onOpenNewModal, onSelectApplication }
             {/* Next Button */}
             <button
               onClick={() => setCurrentPage((p) => Math.min(9, p + 1))}
-              className="w-8 h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer"
+              className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer text-xs"
             >
               &gt;
             </button>

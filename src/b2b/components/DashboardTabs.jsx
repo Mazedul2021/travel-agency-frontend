@@ -52,17 +52,27 @@ export default function DashboardTabs({ activeTab, onTabChange }) {
 
   useEffect(() => {
     checkScroll()
+    const timer = setTimeout(checkScroll, 150)
     window.addEventListener('resize', checkScroll)
-    return () => window.removeEventListener('resize', checkScroll)
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener('resize', checkScroll)
+    }
   }, [])
 
   // Auto-scroll active tab into view smoothly on mobile/tablet when activeTab changes
   useEffect(() => {
-    if (activeTabRef.current) {
-      activeTabRef.current.scrollIntoView({
+    if (activeTabRef.current && containerRef.current) {
+      const container = containerRef.current
+      const activeEl = activeTabRef.current
+      const containerRect = container.getBoundingClientRect()
+      const activeRect = activeEl.getBoundingClientRect()
+      const currentRelativeLeft = activeRect.left - containerRect.left + container.scrollLeft
+      const targetScrollLeft = currentRelativeLeft - (containerRect.width / 2) + (activeRect.width / 2)
+
+      container.scrollTo({
+        left: Math.max(0, targetScrollLeft),
         behavior: 'smooth',
-        inline: 'center',
-        block: 'nearest',
       })
     }
     const timer = setTimeout(checkScroll, 350)
@@ -71,17 +81,18 @@ export default function DashboardTabs({ activeTab, onTabChange }) {
 
   const handleScroll = (direction) => {
     if (containerRef.current) {
-      const scrollAmount = direction === 'left' ? -200 : 200
+      const scrollAmount = direction === 'left' ? -180 : 180
       containerRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+      setTimeout(checkScroll, 250)
     }
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6 sm:-mt-7 relative z-20">
-      <div className="bg-white rounded-2xl shadow-md border border-slate-100 p-1.5 sm:p-2 relative overflow-hidden">
+    <div className="w-full max-w-7xl min-w-0 mx-auto px-3 sm:px-6 lg:px-8 -mt-5 sm:-mt-7 relative z-20">
+      <div className="w-full max-w-full min-w-0 bg-white rounded-2xl shadow-md border border-slate-100 p-1.5 sm:p-2 relative overflow-hidden">
         {/* Left Scroll Cue & Button for small screens */}
         {canScrollLeft && (
-          <div className="absolute left-0 top-0 bottom-0 w-10 bg-gradient-to-r from-white via-white/95 to-transparent pointer-events-none rounded-l-2xl z-10 flex items-center pl-1.5 lg:hidden animate-fade-in">
+          <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-10 bg-gradient-to-r from-white via-white/95 to-transparent pointer-events-none rounded-l-2xl z-10 flex items-center pl-1 sm:pl-1.5 lg:hidden animate-fade-in">
             <button
               onClick={() => handleScroll('left')}
               className="pointer-events-auto w-6 h-6 rounded-full bg-white shadow-md border border-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-transform active:scale-90 cursor-pointer"
@@ -95,7 +106,7 @@ export default function DashboardTabs({ activeTab, onTabChange }) {
 
         {/* Right Scroll Cue & Button for small screens */}
         {canScrollRight && (
-          <div className="absolute right-0 top-0 bottom-0 w-10 bg-gradient-to-l from-white via-white/95 to-transparent pointer-events-none rounded-r-2xl z-10 flex items-center justify-end pr-1.5 lg:hidden animate-fade-in">
+          <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-10 bg-gradient-to-l from-white via-white/95 to-transparent pointer-events-none rounded-r-2xl z-10 flex items-center justify-end pr-1 sm:pr-1.5 lg:hidden animate-fade-in">
             <button
               onClick={() => handleScroll('right')}
               className="pointer-events-auto w-6 h-6 rounded-full bg-white shadow-md border border-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center transition-transform active:scale-90 cursor-pointer"
@@ -113,7 +124,7 @@ export default function DashboardTabs({ activeTab, onTabChange }) {
           onScroll={checkScroll}
           role="tablist"
           aria-label="Dashboard navigation tabs"
-          className="flex lg:grid lg:grid-cols-5 items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory w-full"
+          className="w-full min-w-0 flex lg:grid lg:grid-cols-5 items-center gap-1 sm:gap-1.5 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory overscroll-x-contain touch-pan-x py-0.5 scroll-px-2"
         >
           {tabs.map((tab) => {
             const Icon = tab.icon
@@ -127,14 +138,14 @@ export default function DashboardTabs({ activeTab, onTabChange }) {
                 aria-selected={isActive}
                 aria-current={isActive ? 'page' : undefined}
                 onClick={() => onTabChange(tab.id)}
-                className={`group shrink-0 snap-center lg:shrink w-auto lg:w-full flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 whitespace-nowrap cursor-pointer select-none ${
+                className={`group shrink-0 snap-center lg:shrink w-auto lg:w-full flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 lg:px-5 py-2 sm:py-2.5 lg:py-3 rounded-xl text-xs sm:text-[13px] font-semibold transition-all duration-200 whitespace-nowrap cursor-pointer select-none ${
                   isActive
                     ? 'bg-[#1d7bf2] text-white shadow-sm'
                     : 'text-slate-700 hover:text-[#1d7bf2] hover:bg-slate-50'
                 }`}
               >
                 <Icon
-                  className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
+                  className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 transition-transform duration-200 ${
                     isActive ? 'text-white' : 'text-slate-500 group-hover:text-[#1d7bf2]'
                   }`}
                   strokeWidth={2}
