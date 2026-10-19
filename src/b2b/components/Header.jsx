@@ -5,10 +5,6 @@ import {
   ChevronDown,
   Menu,
   X,
-  User,
-  ShieldCheck,
-  Building,
-  LogOut,
   ExternalLink,
   CheckCircle2,
   Clock,
@@ -16,6 +12,7 @@ import {
 } from 'lucide-react'
 import Logo from './common/Logo'
 import { PARTNER_INFO, TOP_NAV_ITEMS } from '../data/partnerData'
+import UserProfileDropdown from '@/components/layout/Header/UserProfileDropdown'
 
 export default function Header({
   onTabChange,
@@ -239,97 +236,26 @@ export default function Header({
             {/* User Profile Dropdown */}
             <div className="relative shrink-0" ref={profileRef}>
               <button
+                type="button"
                 onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                className="flex items-center gap-2 sm:gap-2.5 pl-1 sm:pl-2 pr-1 py-1 rounded-full hover:bg-slate-50 transition-colors cursor-pointer select-none whitespace-nowrap shrink-0"
+                className="flex items-center gap-1.5 cursor-pointer rounded-full p-0.5 transition-transform hover:opacity-95 active:scale-95 focus:outline-none"
+                aria-label="Toggle user profile menu"
+                aria-expanded={profileMenuOpen}
               >
-                {/* Circular Navy Badge with Initials */}
-                <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-[#0d2b59] text-white font-semibold text-xs sm:text-sm flex items-center justify-center shadow-xs shrink-0">
-                  {partner.initials || 'AR'}
+                <div className="flex size-9.5 items-center justify-center rounded-full bg-[#0066ff] text-sm font-bold text-white shadow-sm select-none">
+                  {partner.initials?.[0] || 'A'}
                 </div>
-                {/* Name & Role */}
-                <div className="hidden sm:flex flex-col text-left whitespace-nowrap shrink-0">
-                  <span className="text-xs font-bold text-slate-800 leading-tight whitespace-nowrap">
-                    {partner.name || 'Abdul Rahman'}
-                  </span>
-                  <span className="text-[11px] text-slate-500 leading-tight whitespace-nowrap">
-                    Partner
-                  </span>
-                </div>
-                <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block shrink-0" />
+                <ChevronDown className={`size-3.5 text-slate-700 transition-transform duration-200 ${profileMenuOpen ? 'rotate-180' : ''}`} />
               </button>
 
-              {/* Profile Dropdown Menu */}
-              {profileMenuOpen && (
-                <div className="absolute right-0 top-full mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 p-2 z-50 animate-fade-in">
-                  <div className="px-3 py-2 border-b border-slate-100 mb-1">
-                    <p className="text-xs font-bold text-slate-800">{partner.name}</p>
-                    <p className="text-[11px] text-slate-500">{partner.agencyName}</p>
-                    <div className="mt-1.5 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-blue-50 text-blue-700">
-                      <ShieldCheck className="w-3 h-3 text-blue-600" />
-                      {partner.partnerId}
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setProfileMenuOpen(false)
-                      onTabChange('profile')
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 rounded-xl transition-colors text-left"
-                  >
-                    <User className="w-4 h-4 text-slate-400" />
-                    <span>My Profile & Agency</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setProfileMenuOpen(false)
-                      onTabChange('invoices')
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 rounded-xl transition-colors text-left"
-                  >
-                    <DollarSign className="w-4 h-4 text-slate-400" />
-                    <span>Invoices & Commission</span>
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setProfileMenuOpen(false)
-                      onTabChange('support')
-                    }}
-                    className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 rounded-xl transition-colors text-left"
-                  >
-                    <Building className="w-4 h-4 text-slate-400" />
-                    <span>Partner Support Desk</span>
-                  </button>
-
-                  {onNavigateToStorefront && (
-                    <button
-                      onClick={() => {
-                        setProfileMenuOpen(false)
-                        onNavigateToStorefront()
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-[#0066cc] hover:bg-blue-50 rounded-xl transition-colors text-left"
-                    >
-                      <ExternalLink className="w-4 h-4 text-[#0066cc]" />
-                      <span>Visit Storefront Website</span>
-                    </button>
-                  )}
-
-                  <div className="border-t border-slate-100 mt-1 pt-1">
-                    <button
-                      onClick={() => {
-                        setProfileMenuOpen(false)
-                        if (onLogout) onLogout()
-                      }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-rose-600 hover:bg-rose-50 rounded-xl transition-colors text-left cursor-pointer"
-                    >
-                      <LogOut className="w-4 h-4 text-rose-500" />
-                      <span>Log Out</span>
-                    </button>
-                  </div>
-                </div>
-              )}
+              <UserProfileDropdown
+                user={partner}
+                isB2B={true}
+                isOpen={profileMenuOpen}
+                onClose={() => setProfileMenuOpen(false)}
+                onLogout={onLogout}
+                onNavigateToDashboard={() => onTabChange('profile')}
+              />
             </div>
 
             {/* Mobile Hamburger Menu Button */}

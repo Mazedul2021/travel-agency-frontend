@@ -1,6 +1,22 @@
-import { useState, useRef, useEffect, useCallback } from 'react'
-import { ArrowRight, ChevronLeft, ChevronRight, Users } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowRight, Pause, Play, Users } from 'lucide-react'
 import { goToVisa } from '@/hooks'
+
+/*
+  Brand colors taken from the ABL Travels logo:
+  blue   #0d81f0 (dark #0a5ec0, soft track #e3effc)
+  orange #ff9a00 (dark #b45f00 for small text)
+  navy   #0b2a4a (text)
+*/
+const focusRing =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0d81f0] focus-visible:ring-offset-2 focus-visible:ring-offset-[#f5f9fe]'
+
+// The marquee speed is constant in px/second on every screen size.
+// The loop duration is measured from the real track width, so mobile
+// (narrower cards) and desktop scroll at exactly the same pace.
+const MARQUEE_SPEED_PX_PER_SEC = 40
+const DEFAULT_LOOP_SECONDS = 70 // fallback until the track is measured
+const GAUGE_STAGGER_MS = 90 // delay between each gauge starting to fill
 
 // Ultra-crisp Circular Vector Flags
 function CircularFlag({ code, className = 'size-6' }) {
@@ -143,516 +159,483 @@ function CircularFlag({ code, className = 'size-6' }) {
   }
 }
 
-// Country Card Data matching reference image + expanded destinations
+// Country card data
 const COUNTRIES = [
   {
     name: 'China',
     flagCode: 'CN',
-    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1508804185872-d7badad00f7d?auto=format&fit=crop&w=480&q=75',
     successRate: 98,
     visasIssued: '2,540',
-    color: '#ef4444', // Red
-    trackColor: '#fee2e2',
   },
   {
     name: 'Thailand',
     flagCode: 'TH',
-    image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1528181304800-259b08848526?auto=format&fit=crop&w=480&q=75',
     successRate: 96,
     visasIssued: '1,820',
-    color: '#0284c7', // Sky blue / cyan
-    trackColor: '#e0f2fe',
   },
   {
     name: 'Singapore',
     flagCode: 'SG',
-    image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?auto=format&fit=crop&w=480&q=75',
     successRate: 97,
     visasIssued: '1,150',
-    color: '#a855f7', // Purple
-    trackColor: '#f3e8ff',
   },
   {
     name: 'Malaysia',
     flagCode: 'MY',
-    image: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1537956965359-7573183d1f57?auto=format&fit=crop&w=480&q=75',
     successRate: 95,
     visasIssued: '1,430',
-    color: '#f59e0b', // Amber / Gold
-    trackColor: '#fef3c7',
   },
   {
     name: 'UAE',
     flagCode: 'AE',
-    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?auto=format&fit=crop&w=480&q=75',
     successRate: 94,
     visasIssued: '980',
-    color: '#10b981', // Emerald / Green
-    trackColor: '#d1fae5',
   },
   {
     name: 'Turkey',
     flagCode: 'TR',
-    image: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1524231757912-21f4fe3a7200?auto=format&fit=crop&w=480&q=75',
     successRate: 93,
     visasIssued: '720',
-    color: '#ec4899', // Pink / Magenta
-    trackColor: '#fce7f3',
   },
   {
     name: 'India',
     flagCode: 'IN',
-    image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&w=480&q=75',
     successRate: 92,
     visasIssued: '1,680',
-    color: '#0284c7', // Bright Blue
-    trackColor: '#e0f2fe',
   },
   {
     name: 'Schengen',
     flagCode: 'EU',
-    image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?auto=format&fit=crop&w=480&q=75',
     successRate: 91,
     visasIssued: '1,120',
-    color: '#7c3aed', // Violet / Purple
-    trackColor: '#ede9fe',
   },
   {
     name: 'United Kingdom',
     flagCode: 'GB',
-    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?auto=format&fit=crop&w=480&q=75',
     successRate: 94,
     visasIssued: '890',
-    color: '#1d4ed8', // Royal Blue
-    trackColor: '#dbeafe',
   },
   {
     name: 'United States',
     flagCode: 'US',
-    image: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?auto=format&fit=crop&w=480&q=75',
     successRate: 90,
     visasIssued: '650',
-    color: '#b91c1c', // Crimson
-    trackColor: '#fee2e2',
   },
   {
     name: 'Japan',
     flagCode: 'JP',
-    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=480&q=75',
     successRate: 97,
     visasIssued: '1,240',
-    color: '#e11d48', // Rose Red
-    trackColor: '#ffe4e6',
   },
   {
     name: 'Saudi Arabia',
     flagCode: 'SA',
-    image: 'https://images.unsplash.com/photo-1580418827493-f2b22c0a76cb?auto=format&fit=crop&w=600&q=80',
+    image: 'https://images.unsplash.com/photo-1580418827493-f2b22c0a76cb?auto=format&fit=crop&w=480&q=75',
     successRate: 99,
     visasIssued: '3,100',
-    color: '#059669', // Emerald
-    trackColor: '#d1fae5',
   },
 ]
 
-// Open-Arc Gauge with Percentage EXACTLY in the Center of Circle
-function ArcGauge({ percent, color, trackColor, flagCode }) {
-  // Center is mathematically at (50, 48) with radius 35
+// Open-arc gauge: percentage in the center, flag in the gap at the bottom.
+// The arc fills in — with a small per-card stagger — once the section is in view.
+function ArcGauge({ percent, flagCode, animate, delay = 0 }) {
   const cx = 50
   const cy = 48
   const radius = 35
   const circumference = 2 * Math.PI * radius
-  // 260-degree arc opening downwards for the flag anchor
   const arcLength = circumference * (260 / 360)
-  const progressLength = (percent / 100) * arcLength
+  const progressLength = animate ? (percent / 100) * arcLength : 0
 
   return (
-    <div className="relative w-22 h-21 mx-auto flex items-center justify-center select-none">
-      <svg viewBox="0 0 100 100" className="w-full h-full overflow-visible">
-        {/* Soft Background Track Arc */}
+    <div
+      className="relative mx-auto flex size-24 select-none items-center justify-center"
+      role="img"
+      aria-label={`${percent} percent visa success rate`}
+    >
+      <svg viewBox="0 0 100 100" className="h-full w-full overflow-visible" aria-hidden="true">
         <circle
           cx={cx}
           cy={cy}
           r={radius}
           fill="none"
-          stroke={trackColor}
+          stroke="#e3effc"
           strokeWidth="6"
           strokeLinecap="round"
           strokeDasharray={`${arcLength} ${circumference}`}
           transform={`rotate(140 ${cx} ${cy})`}
         />
 
-        {/* Foreground Progress Arc */}
+        {/* Progress arc: hidden (opacity 0) until it fills, so the round line
+            cap never draws a stray dot at 0%. Delay creates the stagger. */}
         <circle
           cx={cx}
           cy={cy}
           r={radius}
           fill="none"
-          stroke={color}
+          stroke="#0d81f0"
           strokeWidth="6"
           strokeLinecap="round"
           strokeDasharray={`${progressLength} ${circumference}`}
           transform={`rotate(140 ${cx} ${cy})`}
-          className="transition-all duration-700 ease-out"
+          className="transition-[stroke-dasharray,opacity] duration-[1400ms] ease-out motion-reduce:transition-none"
+          style={{
+            opacity: animate ? 1 : 0,
+            transitionDelay: `${delay}ms`,
+          }}
         />
 
-        {/* Centered Percentage — Mathematically & visually centered in the middle of the circle */}
         <text
           x={cx}
           y={cy}
           textAnchor="middle"
           dominantBaseline="central"
-          className="font-black text-[18px] fill-[#0a192f] select-none tracking-tight drop-shadow-2xs"
+          className="select-none fill-[#0b2a4a] font-serif text-[20px] font-semibold"
         >
           {percent}%
         </text>
       </svg>
 
-      {/* National Circular Flag Badge positioned right in the bottom arc gap */}
-      <div className="absolute -bottom-1 inset-x-0 flex justify-center z-10 pointer-events-none">
-        <CircularFlag code={flagCode} className="size-6 drop-shadow-sm ring-2 ring-white" />
+      <div
+        className="pointer-events-none absolute inset-x-0 -bottom-1 z-10 flex justify-center"
+        aria-hidden="true"
+      >
+        <CircularFlag code={flagCode} className="size-6 drop-shadow-sm" />
       </div>
     </div>
   )
 }
 
-// Single Country Card with Premium Glass & Micro-elevation
-function CountryCard({ country, onSelect }) {
-  return (
-    <div
-      data-country-card
-      onClick={() => onSelect?.(country.flagCode)}
-      className="snap-start shrink-0 w-[175px] sm:w-[190px] md:w-[205px] lg:w-[215px] xl:w-[220px] bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-[0_4px_18px_-4px_rgba(15,23,42,0.06)] hover:shadow-[0_16px_36px_-6px_rgba(15,23,42,0.12)] hover:-translate-y-1.5 transition-all duration-300 ease-out flex flex-col group select-none cursor-pointer"
-    >
-      {/* Top Accent Gradient Color Stripe */}
-      <div
-        className="h-1 w-full shrink-0"
-        style={{
-          background: `linear-gradient(90deg, ${country.color}, ${country.trackColor} 120%)`,
-        }}
-      />
+// One country card: a single link, so it works with keyboard and screen readers
+function CountryCard({ country, index, onSelect, animate, decorative = false }) {
+  const code = country.flagCode.toLowerCase()
 
-      {/* Top Landmark Photo with subtle zoom on hover */}
-      <div className="relative h-24 sm:h-28 w-full overflow-hidden bg-slate-100">
+  return (
+    <a
+      href={`/visa#visa/${code}`}
+      onClick={(e) => onSelect(e, code)}
+      onDragStart={(e) => e.preventDefault()}
+      draggable={false}
+      tabIndex={decorative ? -1 : undefined}
+      aria-hidden={decorative || undefined}
+      aria-label={`${country.name}: ${country.successRate}% success rate, ${country.visasIssued} visas issued`}
+      className={`group flex w-[200px] shrink-0 select-none flex-col overflow-hidden rounded-2xl border border-[#0b2a4a]/10 bg-white shadow-[0_10px_30px_-14px_rgba(11,42,74,0.35)] transition-all duration-500 hover:-translate-y-1.5 hover:shadow-[0_24px_44px_-16px_rgba(11,42,74,0.45)] sm:w-[215px] lg:w-[230px] ${focusRing}`}
+    >
+      {/* Photo */}
+      <div className="relative h-28 w-full overflow-hidden bg-gradient-to-br from-[#d7e8fb] to-[#eaf3fd] sm:h-32">
+        {/* Responsive srcSet: phones download the 240w version, desktops the 480w one */}
         <img
           src={country.image}
-          alt={country.name}
-          className="w-full h-full object-cover object-center group-hover:scale-108 transition-transform duration-700 ease-out"
+          srcSet={`${country.image.replace('w=480', 'w=240')} 240w, ${country.image} 480w`}
+          sizes="(max-width: 640px) 200px, 230px"
+          alt=""
           loading="lazy"
+          decoding="async"
+          onError={(e) => {
+            e.currentTarget.style.visibility = 'hidden'
+          }}
           draggable="false"
+          className="h-full w-full object-cover object-center transition-transform duration-[900ms] ease-out group-hover:scale-105"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#061a33]/55 via-transparent to-transparent" />
+        {/* Brand line, same blue to orange as the header */}
+        <div className="absolute inset-x-0 bottom-0 h-[3px] bg-gradient-to-r from-[#0d81f0] via-[#0d81f0] to-[#ff9a00]" />
       </div>
 
-      {/* Card Body with Elegant Arch Overlap */}
-      <div className="relative -mt-4 bg-white rounded-t-[22px] px-3 pt-3 pb-3.5 flex flex-col items-center text-center flex-1 justify-between shadow-2xs">
-        {/* Country Name */}
-        <h3 className="text-xs sm:text-[13px] font-bold text-[#0a192f] tracking-tight group-hover:text-amber-600 transition-colors">
+      {/* Body */}
+      <div className="flex flex-1 flex-col items-center px-4 pb-4 pt-4 text-center">
+        <h3 className="font-serif text-lg font-semibold tracking-tight text-[#0b2a4a]">
           {country.name}
         </h3>
 
-        {/* Circular Progress Gauge with Center Percentage */}
-        <div className="my-1.5">
+        <div className="mt-3">
           <ArcGauge
             percent={country.successRate}
-            color={country.color}
-            trackColor={country.trackColor}
             flagCode={country.flagCode}
+            animate={animate}
+            delay={index * GAUGE_STAGGER_MS}
           />
         </div>
 
-        {/* Visas Issued Statistics */}
-        <div className="mt-2 pt-2 border-t border-slate-100 w-full flex flex-col items-center">
-          <div className="flex items-center justify-center gap-1.5">
-            <div
-              className="size-4.5 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: `${country.color}15`, color: country.color }}
-            >
-              <Users className="size-3" strokeWidth={2.4} />
-            </div>
-            <span
-              className="text-xs sm:text-[13px] font-black tracking-tight"
-              style={{ color: country.color }}
-            >
+        <div className="mt-4 flex w-full flex-col items-center border-t border-[#0b2a4a]/10 pt-3">
+          <div className="flex items-center gap-2">
+            <span className="flex size-6 items-center justify-center rounded-full bg-[#0d81f0]/10 text-[#0a5ec0]">
+              <Users className="size-3.5" strokeWidth={2.2} aria-hidden="true" />
+            </span>
+            <span className="font-serif text-xl font-semibold tabular-nums text-[#0a5ec0]">
               {country.visasIssued}
             </span>
           </div>
-          <span className="block text-[10px] text-slate-400 font-semibold tracking-wide uppercase mt-0.5">
-            Visas Issued
+          <span className="mt-0.5 text-xs font-medium text-slate-500">
+            Visas issued
           </span>
         </div>
       </div>
-    </div>
+    </a>
   )
 }
 
 export default function TrustedWorldwide() {
-  const scrollRef = useRef(null)
-  const [activeDot, setActiveDot] = useState(0)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
+  const sectionRef = useRef(null)
+  const firstSetRef = useRef(null)
+  const touchTimer = useRef(null)
+  const [inView, setInView] = useState(false)
+  const [loopSeconds, setLoopSeconds] = useState(DEFAULT_LOOP_SECONDS)
+  const [userPaused, setUserPaused] = useState(false) // pause button
+  const [touchPaused, setTouchPaused] = useState(false) // finger on the track
+  const [keyboardFocus, setKeyboardFocus] = useState(false) // tabbing through cards
 
-  // Drag-to-scroll interaction for desktop
-  const isDragging = useRef(false)
-  const dragDistance = useRef(0)
-  const startX = useRef(0)
-  const scrollLeftState = useRef(0)
-  const totalDots = 5
+  const marqueePaused = userPaused || touchPaused
 
-  const handleSelectCountry = (flagCode) => {
-    if (dragDistance.current > 5) return
+  // Link click: on /visa use the in-page handler, otherwise follow the link
+  const handleSelectCountry = (e, code) => {
     if (window.location.pathname === '/visa') {
-      goToVisa(flagCode.toLowerCase())
-    } else {
-      window.location.href = `/visa#visa/${flagCode.toLowerCase()}`
+      e.preventDefault()
+      goToVisa(code)
     }
   }
 
-  // Update button states and pagination based on scroll position
-  const handleScroll = useCallback(() => {
-    if (!scrollRef.current) return
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
+  // Keyboard users: stop the loop, lay the cards out from the start and
+  // center every focused card so none of them can be "lost" off-screen.
+  const handleRegionFocus = (e) => {
+    if (!e.target.matches?.(':focus-visible')) return
+    setKeyboardFocus(true)
 
-    setCanScrollLeft(scrollLeft > 10)
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10)
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    // Wait one frame so the track transform is cleared before centering
+    window.requestAnimationFrame(() => {
+      e.target.scrollIntoView?.({
+        behavior: reduceMotion ? 'auto' : 'smooth',
+        inline: 'center',
+        block: 'nearest',
+      })
+    })
+  }
 
-    const maxScroll = scrollWidth - clientWidth
-    if (maxScroll > 0) {
-      const progress = scrollLeft / maxScroll
-      const dotIndex = Math.min(Math.floor(progress * totalDots), totalDots - 1)
-      setActiveDot(dotIndex)
+  const handleRegionBlur = (e) => {
+    if (e.currentTarget.contains(e.relatedTarget)) return
+    setKeyboardFocus(false)
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      e.currentTarget.scrollLeft = 0
     }
-  }, [totalDots])
+  }
 
+  // Touch users cannot hover, so holding a finger on the track pauses it
+  // and lets it resume gently after they let go.
+  const handleTouchStart = () => {
+    window.clearTimeout(touchTimer.current)
+    setTouchPaused(true)
+  }
+  const handleTouchEnd = () => {
+    window.clearTimeout(touchTimer.current)
+    touchTimer.current = window.setTimeout(() => setTouchPaused(false), 1600)
+  }
+  useEffect(() => () => window.clearTimeout(touchTimer.current), [])
+
+  // Measure one full card set and derive the loop duration from it, so the
+  // scroll speed is identical on mobile, tablet and desktop.
   useEffect(() => {
-    handleScroll()
-    const handleResize = () => handleScroll()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [handleScroll])
+    const setEl = firstSetRef.current
+    if (!setEl) return undefined
 
-  // Mouse Drag to Scroll handlers
-  const handleMouseDown = (e) => {
-    if (!scrollRef.current) return
-    isDragging.current = true
-    dragDistance.current = 0
-    startX.current = e.pageX - scrollRef.current.offsetLeft
-    scrollLeftState.current = scrollRef.current.scrollLeft
-  }
+    const measure = () => {
+      const width = setEl.offsetWidth // one full set, including the trailing gap
+      if (width > 0) {
+        setLoopSeconds(
+          Math.round((width / MARQUEE_SPEED_PX_PER_SEC) * 10) / 10
+        )
+      }
+    }
 
-  const handleMouseLeave = () => {
-    isDragging.current = false
-  }
+    measure()
+    if (typeof ResizeObserver === 'undefined') return undefined
+    const observer = new ResizeObserver(measure)
+    observer.observe(setEl)
+    return () => observer.disconnect()
+  }, [])
 
-  const handleMouseUp = () => {
-    isDragging.current = false
-  }
-
-  const handleMouseMove = (e) => {
-    if (!isDragging.current || !scrollRef.current) return
-    e.preventDefault()
-    const x = e.pageX - scrollRef.current.offsetLeft
-    const diff = Math.abs(x - startX.current)
-    dragDistance.current += diff
-    const walk = (x - startX.current) * 1.4 // Speed multiplier for responsive drag
-    scrollRef.current.scrollLeft = scrollLeftState.current - walk
-  }
-
-  // Smooth scroll buttons
-  const scroll = (direction) => {
-    if (!scrollRef.current) return
-    const container = scrollRef.current
-    const scrollAmount = container.clientWidth * 0.7
-    container.scrollBy({
-      left: direction === 'left' ? -scrollAmount : scrollAmount,
-      behavior: 'smooth',
-    })
-  }
-
-  // Scroll to dot page
-  const scrollToDot = (dotIndex) => {
-    if (!scrollRef.current) return
-    const container = scrollRef.current
-    const maxScroll = container.scrollWidth - container.clientWidth
-    const targetScroll = (dotIndex / (totalDots - 1)) * maxScroll
-    container.scrollTo({
-      left: targetScroll,
-      behavior: 'smooth',
-    })
-    setActiveDot(dotIndex)
-  }
+  // Fill the gauges once, when the section first comes into view
+  useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    if (reduceMotion || !('IntersectionObserver' in window) || !sectionRef.current) {
+      setInView(true)
+      return undefined
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true)
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.2 }
+    )
+    observer.observe(sectionRef.current)
+    return () => observer.disconnect()
+  }, [])
 
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#faf7f2] via-[#fdfbf7] to-[#f8f5ee] py-14 sm:py-20 border-b border-amber-100/50">
-      {/* Luxury Ambient Radial Glow in the Center */}
+    <section
+      ref={sectionRef}
+      aria-labelledby="trusted-worldwide-title"
+      className="relative overflow-hidden bg-[#f5f9fe] py-16 sm:py-20 lg:py-24"
+    >
+      {/* Endless left-moving loop: the track holds two copies, so -50% is one full set */}
+      <style>{`
+        @keyframes trustedMarquee {
+          from { transform: translateX(0); }
+          to   { transform: translateX(-50%); }
+        }
+      `}</style>
+
+      {/* Soft blue glow + dotted pattern */}
       <div
-        className="pointer-events-none absolute inset-0 select-none bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(217,119,6,0.07),transparent)]"
+        className="pointer-events-none absolute inset-0 select-none bg-[radial-gradient(ellipse_80%_60%_at_50%_-15%,rgba(13,129,240,0.10),transparent)]"
         aria-hidden="true"
       />
-
-      {/* Subtle World Map Dotted Pattern Background */}
       <div
-        className="pointer-events-none absolute inset-0 opacity-[0.035] select-none"
+        className="pointer-events-none absolute inset-0 select-none opacity-[0.05]"
         style={{
-          backgroundImage: `radial-gradient(circle, #b45309 1px, transparent 1px)`,
+          backgroundImage: 'radial-gradient(circle, #0a5ec0 1px, transparent 1px)',
           backgroundSize: '24px 24px',
         }}
         aria-hidden="true"
       />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* ======================================================== */}
-        {/* 1. SECTION HEADER: Title, Subtitle, Airplane Trail & CTA */}
-        {/* ======================================================== */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8 sm:mb-10">
-          <div>
-            {/* Premium Pill Badge: Orange Dot + VISA SUCCESS */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-[#b45309] text-[11px] font-bold tracking-[0.22em] uppercase shadow-2xs mb-2.5">
-              <span className="size-2 rounded-full bg-[#f97316] animate-pulse" />
-              <span>VISA SUCCESS</span>
-            </div>
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-10 flex flex-col justify-between gap-6 sm:mb-12 md:flex-row md:items-end">
+          <div className="max-w-2xl">
+            <p className="font-script text-3xl text-[#b45f00] sm:text-4xl">
+              Visa success rate
+            </p>
 
-            {/* Main Headline with Serif Golden Worldwide */}
-            <h2 className="text-3xl sm:text-4xl lg:text-[42px] font-black text-[#0a192f] tracking-tight leading-[1.15]">
-              Trusted by Thousands{' '}
-              <span
-                className="font-serif italic font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#b45309] via-[#d97706] to-[#b45309]"
-                style={{ fontFamily: "'Playfair Display', Georgia, serif" }}
-              >
-                Worldwide
-              </span>
+            <h2
+              id="trusted-worldwide-title"
+              className="mt-2 font-serif text-3xl font-semibold leading-[1.1] tracking-tight text-[#0b2a4a] text-balance sm:text-4xl lg:text-5xl"
+            >
+              Trusted by thousands worldwide
             </h2>
 
-            <p className="text-xs sm:text-sm text-slate-500 mt-2.5 max-w-xl leading-relaxed">
-              Successfully helping travelers from around the world get their visas with an exceptional success rate.
+            <p className="mt-4 max-w-xl text-[15px] leading-7 text-slate-600 sm:text-base sm:leading-8">
+              From document checklist to final approval, our visa specialists
+              manage every step of the journey — so your paperwork is one less
+              thing to worry about.
             </p>
           </div>
 
-          {/* Right Side: Airplane Flight Path + CTA Button */}
-          <div className="flex flex-col items-start md:items-end gap-2 shrink-0">
-            {/* Flight Path SVG with Orange Airplane */}
-            <div className="hidden sm:flex items-center justify-end w-48 h-8 pointer-events-none -mb-1 mr-4 select-none">
-              <svg viewBox="0 0 160 30" className="w-full h-full" fill="none">
+          <div className="flex shrink-0 flex-col items-start gap-3 md:items-end">
+            {/* Flight path */}
+            <div
+              className="pointer-events-none -mb-1 mr-4 hidden h-8 w-48 select-none items-center justify-end sm:flex"
+              aria-hidden="true"
+            >
+              <svg viewBox="0 0 160 30" className="h-full w-full" fill="none">
                 <path
                   d="M 5,22 Q 80,24 140,8"
-                  stroke="#f97316"
+                  stroke="#ff9a00"
                   strokeWidth="1.6"
                   strokeDasharray="4 4"
-                  opacity="0.65"
+                  opacity="0.8"
                 />
                 <g transform="translate(142, 6) rotate(-22)">
-                  <path
-                    d="M 0,0 L 12,3.5 L 0,7 L 3,3.5 Z"
-                    fill="#f97316"
-                  />
+                  <path d="M 0,0 L 12,3.5 L 0,7 L 3,3.5 Z" fill="#ff9a00" />
                 </g>
               </svg>
             </div>
 
-            {/* View All Countries Button */}
-            <a
-              href="/visa"
-              className="group inline-flex items-center gap-2.5 px-6 py-2.5 rounded-full bg-white hover:bg-slate-50 text-[#0a192f] border border-slate-200/90 hover:border-amber-400 text-xs sm:text-[13px] font-bold shadow-xs hover:shadow-md transition-all duration-300 hover:-translate-y-0.5 cursor-pointer"
-            >
-              <span>View All Countries</span>
-              <ArrowRight className="size-3.5 stroke-[2.5] text-amber-600 group-hover:translate-x-1 transition-transform" />
-            </a>
+            <div className="flex w-full items-center gap-3 sm:w-auto">
+              {/* Pause / play for the moving slider */}
+              <button
+                type="button"
+                onClick={() => setUserPaused((value) => !value)}
+                aria-pressed={userPaused}
+                aria-label={userPaused ? 'Play slider' : 'Pause slider'}
+                title={userPaused ? 'Play slider' : 'Pause slider'}
+                className={`flex size-11 shrink-0 items-center justify-center rounded-full border border-[#0b2a4a]/20 bg-white/80 text-[#0b2a4a] backdrop-blur-sm transition-colors hover:border-[#0d81f0] hover:text-[#0a5ec0] motion-reduce:hidden ${focusRing}`}
+              >
+                {userPaused ? (
+                  <Play className="size-4 fill-current" aria-hidden="true" />
+                ) : (
+                  <Pause className="size-4 fill-current" aria-hidden="true" />
+                )}
+              </button>
 
-            {/* Subtext */}
-            <p className="text-[11px] text-slate-400 font-medium tracking-wide">
+              <a
+                href="/visa"
+                className={`group inline-flex flex-1 items-center justify-center gap-3 rounded-full border border-[#0b2a4a]/20 bg-white/80 px-6 py-3 text-sm font-semibold text-[#0b2a4a] backdrop-blur-sm transition-all duration-300 hover:border-[#0b2a4a] hover:bg-[#0b2a4a] hover:text-white sm:flex-none ${focusRing}`}
+              >
+                View all countries
+                <ArrowRight
+                  className="size-4 transition-transform duration-300 group-hover:translate-x-1"
+                  aria-hidden="true"
+                />
+              </a>
+            </div>
+
+            <p className="text-xs text-slate-500">
               Real data. Real travelers. Real success.
             </p>
           </div>
         </div>
+      </div>
 
-        {/* ======================================================== */}
-        {/* 2. SILKY-SMOOTH SCROLLABLE CAROUSEL CONTAINER            */}
-        {/* ======================================================== */}
-        <div className="relative group/carousel">
-          {/* Subtle Left Gradient Edge Fade */}
-          <div
-            className={`pointer-events-none absolute left-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-r from-[#faf7f2] to-transparent z-10 transition-opacity duration-300 ${
-              canScrollLeft ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
-
-          {/* Subtle Right Gradient Edge Fade */}
-          <div
-            className={`pointer-events-none absolute right-0 top-0 bottom-0 w-8 sm:w-16 bg-gradient-to-l from-[#faf7f2] to-transparent z-10 transition-opacity duration-300 ${
-              canScrollRight ? 'opacity-100' : 'opacity-0'
-            }`}
-          />
-
-          {/* Left Arrow Button */}
-          <button
-            type="button"
-            onClick={() => scroll('left')}
-            className={`absolute -left-3 sm:-left-5 top-1/2 -translate-y-1/2 z-20 size-10 sm:size-12 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.12)] flex items-center justify-center transition-all duration-300 ${
-              canScrollLeft
-                ? 'text-slate-800 hover:text-amber-600 hover:border-amber-400 hover:scale-110 active:scale-95 cursor-pointer opacity-100'
-                : 'text-slate-300 border-slate-100 cursor-not-allowed opacity-0 pointer-events-none'
-            }`}
-            aria-label="Previous countries"
-          >
-            <ChevronLeft className="w-5 h-5 stroke-[2.5]" />
-          </button>
-
-          {/* Scrollable Horizontal Track */}
-          <div
-            ref={scrollRef}
-            onScroll={handleScroll}
-            onMouseDown={handleMouseDown}
-            onMouseLeave={handleMouseLeave}
-            onMouseUp={handleMouseUp}
-            onMouseMove={handleMouseMove}
-            className="flex items-stretch gap-3.5 sm:gap-4 overflow-x-auto no-scrollbar scroll-smooth snap-x snap-mandatory py-4 px-1 cursor-grab active:cursor-grabbing select-none"
-            style={{
-              WebkitOverflowScrolling: 'touch',
-              scrollbarWidth: 'none',
-              msOverflowStyle: 'none',
-            }}
-          >
-            {COUNTRIES.map((country) => (
+      {/* Continuous slider: full width, soft fade on both edges. Pauses on
+          hover, while touched, with the pause button, or during keyboard use. */}
+      <div
+        className="group/marquee relative overflow-hidden py-6 [mask-image:linear-gradient(to_right,transparent,black_6%,black_94%,transparent)] motion-reduce:overflow-x-auto motion-reduce:[mask-image:none]"
+        role="region"
+        aria-label="Visa success rate by country"
+        onFocus={handleRegionFocus}
+        onBlur={handleRegionBlur}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={handleTouchEnd}
+      >
+        <div
+          className="flex w-max will-change-transform motion-safe:animate-[trustedMarquee_linear_infinite] motion-safe:group-hover/marquee:[animation-play-state:paused]"
+          style={{
+            animationDuration: `${loopSeconds}s`,
+            ...(marqueePaused ? { animationPlayState: 'paused' } : {}),
+            ...(keyboardFocus ? { animationName: 'none' } : {}),
+          }}
+        >
+          {/* Set 1 */}
+          <div ref={firstSetRef} className="flex gap-4 pr-4">
+            {COUNTRIES.map((country, index) => (
               <CountryCard
                 key={country.name}
                 country={country}
+                index={index}
                 onSelect={handleSelectCountry}
+                animate={inView}
               />
             ))}
           </div>
 
-          {/* Right Arrow Button */}
-          <button
-            type="button"
-            onClick={() => scroll('right')}
-            className={`absolute -right-3 sm:-right-5 top-1/2 -translate-y-1/2 z-20 size-10 sm:size-12 rounded-full bg-white/95 backdrop-blur-md border border-slate-200/90 shadow-[0_4px_20px_rgba(0,0,0,0.12)] flex items-center justify-center transition-all duration-300 ${
-              canScrollRight
-                ? 'text-slate-800 hover:text-amber-600 hover:border-amber-400 hover:scale-110 active:scale-95 cursor-pointer opacity-100'
-                : 'text-slate-300 border-slate-100 cursor-not-allowed opacity-0 pointer-events-none'
-            }`}
-            aria-label="Next countries"
-          >
-            <ChevronRight className="w-5 h-5 stroke-[2.5]" />
-          </button>
-        </div>
-
-        {/* ======================================================== */}
-        {/* 3. PAGINATION DOTS (INTERACTIVE & DYNAMIC TO SCROLL)     */}
-        {/* ======================================================== */}
-        <div className="mt-8 sm:mt-10 flex items-center justify-center gap-2 select-none">
-          {Array.from({ length: totalDots }).map((_, idx) => (
-            <button
-              key={idx}
-              type="button"
-              onClick={() => scrollToDot(idx)}
-              className={`transition-all duration-300 rounded-full cursor-pointer ${
-                activeDot === idx
-                  ? 'h-2 w-7 bg-gradient-to-r from-[#f97316] to-[#ea580c] shadow-xs'
-                  : 'h-2 w-2 bg-slate-200 hover:bg-slate-300'
-              }`}
-              aria-label={`Go to slide page ${idx + 1}`}
-            />
-          ))}
+          {/* Set 2: identical copy that makes the loop seamless (hidden from assistive tech) */}
+          <div className="flex gap-4 pr-4 motion-reduce:hidden" aria-hidden="true">
+            {COUNTRIES.map((country, index) => (
+              <CountryCard
+                key={country.name}
+                country={country}
+                index={index}
+                onSelect={handleSelectCountry}
+                animate={inView}
+                decorative
+              />
+            ))}
+          </div>
         </div>
       </div>
     </section>

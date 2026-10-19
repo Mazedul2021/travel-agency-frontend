@@ -266,8 +266,8 @@ export default function AuthModal({ isOpen, onClose, defaultTab = 'b2b', onRedir
                       </span>
                       <span className="block text-[11px] text-slate-500">
                         {activeTab === 'b2b'
-                          ? 'Abdur Rahman (Green Bengal Tours & Travels)'
-                          : 'Tanvir Hossain (Personal Traveler)'}
+                          ? 'Ajmal Travel Agency (B2B Partner)'
+                          : 'Md. Sajjad Hossen (Customer)'}
                       </span>
                     </div>
                   </div>

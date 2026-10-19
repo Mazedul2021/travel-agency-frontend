@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { DEFAULT_VISA_COUNTRY, buildCountryList, getVisaContent } from '@/constants'
 import { useCountries, useVisaSelection } from '@/hooks'
 import CountrySidebar from './CountrySidebar'
@@ -8,10 +8,12 @@ import ProcessingDetails from './ProcessingDetails'
 import RequirementsCard from './RequirementsCard'
 import VisaHero from './VisaHero'
 import VisaTypeTabs from './VisaTypeTabs'
+import VisaApplyModal from './VisaApplyModal'
 
 export default function VisaExplorer() {
   const { countries, status } = useCountries()
   const { code, typeId, selectCountry, selectType } = useVisaSelection()
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false)
 
   const countryList = useMemo(() => buildCountryList(countries), [countries])
 
@@ -51,7 +53,11 @@ export default function VisaExplorer() {
                 <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
                   <RequirementsCard countryName={country.name} type={type} />
                   <div className="order-first space-y-6 xl:order-none">
-                    <FeeCard countryName={country.name} type={type} />
+                    <FeeCard
+                      countryName={country.name}
+                      type={type}
+                      onApply={() => setIsApplyModalOpen(true)}
+                    />
                     <ProcessingDetails facts={details.facts} />
                   </div>
                 </div>
@@ -64,6 +70,15 @@ export default function VisaExplorer() {
           </div>
         </div>
       </div>
+
+      {/* Interactive Visa Application Popup Modal */}
+      <VisaApplyModal
+        isOpen={isApplyModalOpen}
+        onClose={() => setIsApplyModalOpen(false)}
+        country={country}
+        type={type}
+        content={content}
+      />
     </section>
   )
 }

@@ -2,16 +2,16 @@ import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthContext = createContext(null)
 
-// Default demo partner data matching the B2B Dashboard
+// Default demo partner data matching the design screenshot
 export const DEMO_B2B_PARTNER = {
   id: 'usr_b2b_1089',
-  name: 'Abdur Rahman',
-  email: 'partner@abltravels.com',
+  name: 'Ajmal Travel Agency',
+  email: 'ajmaltravel@gmail.com',
   role: 'B2B',
-  initials: 'AR',
-  agencyName: 'Green Bengal Tours & Travels Ltd.',
+  initials: 'A',
+  agencyName: 'Ajmal Travel Agency',
   partnerId: 'ABL-B2B-1089',
-  badge: 'Platinum Partner',
+  badge: 'B2B Partner',
   phone: '+880 1711-234567',
   commissionRate: '12%',
   ledgerBalance: '$4,850.00',
@@ -20,10 +20,11 @@ export const DEMO_B2B_PARTNER = {
 
 export const DEMO_B2C_CUSTOMER = {
   id: 'usr_b2c_2045',
-  name: 'Tanvir Hossain',
-  email: 'traveler@gmail.com',
+  name: 'Md. Sajjad Hossen',
+  email: 'sajjad.hossen@gmail.com',
   role: 'B2C',
-  initials: 'TH',
+  initials: 'SH',
+  avatar: '/images/users/sajjad-avatar.jpg',
   phone: '+880 1812-345678',
 }
 
@@ -33,7 +34,18 @@ export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY)
-      return saved ? JSON.parse(saved) : null
+      if (saved) {
+        const parsed = JSON.parse(saved)
+        // Automatically migrate legacy demo accounts to match exact designs
+        if (parsed.email === 'partner@abltravels.com' || parsed.email === 'ajmaltravel@gmail.com') {
+          return DEMO_B2B_PARTNER
+        }
+        if (parsed.email === 'traveler@gmail.com' || parsed.email === 'sajjad.hossen@gmail.com') {
+          return DEMO_B2C_CUSTOMER
+        }
+        return parsed
+      }
+      return null
     } catch {
       return null
     }
@@ -74,18 +86,19 @@ export function AuthProvider({ children }) {
           const mappedRole = (backendUser?.role || role).toUpperCase()
           const userSession = {
             id: backendUser?._id || backendUser?.id || 'usr_' + Date.now(),
-            name: backendUser?.name || (mappedRole === 'B2B' ? DEMO_B2B_PARTNER.name : 'User'),
+            name: backendUser?.name || (mappedRole === 'B2B' ? DEMO_B2B_PARTNER.name : DEMO_B2C_CUSTOMER.name),
             email: backendUser?.email || email,
             role: mappedRole,
             agencyName: backendUser?.partner?.companyName || DEMO_B2B_PARTNER.agencyName,
             partnerId: backendUser?.partner?.partnerCode || DEMO_B2B_PARTNER.partnerId,
-            initials: (backendUser?.name || 'AR')
+            initials: (backendUser?.name || (mappedRole === 'B2B' ? 'A' : 'SH'))
               .split(' ')
               .map((n) => n[0])
               .join('')
               .slice(0, 2)
               .toUpperCase(),
-            badge: mappedRole === 'B2B' ? 'Verified B2B Partner' : 'Customer',
+            badge: mappedRole === 'B2B' ? 'B2B Partner' : 'Customer',
+            avatar: mappedRole === 'B2B' ? null : (backendUser?.avatar || DEMO_B2C_CUSTOMER.avatar),
             token: data.data?.session?.accessToken || data.token,
           }
           setCurrentUser(userSession)
@@ -102,17 +115,32 @@ export function AuthProvider({ children }) {
       userSession = {
         ...DEMO_B2B_PARTNER,
         email: email || DEMO_B2B_PARTNER.email,
-        name: email && email.includes('@') ? (email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())) : DEMO_B2B_PARTNER.name,
+        name: email && email !== DEMO_B2B_PARTNER.email && email.includes('@')
+          ? email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+          : DEMO_B2B_PARTNER.name,
       }
     } else {
       userSession = {
         ...DEMO_B2C_CUSTOMER,
         email: email || DEMO_B2C_CUSTOMER.email,
+        name: email && email !== DEMO_B2C_CUSTOMER.email && email.includes('@')
+          ? email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+          : DEMO_B2C_CUSTOMER.name,
       }
     }
 
     setCurrentUser(userSession)
     return { success: true, user: userSession, role }
+  }
+
+  const loginAsB2B = () => {
+    setCurrentUser(DEMO_B2B_PARTNER)
+    return DEMO_B2B_PARTNER
+  }
+
+  const loginAsB2C = () => {
+    setCurrentUser(DEMO_B2C_CUSTOMER)
+    return DEMO_B2C_CUSTOMER
   }
 
   const logout = () => {
@@ -138,6 +166,8 @@ export function AuthProvider({ children }) {
     isAuthenticated: Boolean(currentUser),
     isB2BPartner: currentUser?.role === 'B2B',
     login,
+    loginAsB2B,
+    loginAsB2C,
     logout,
     isAuthModalOpen,
     authModalDefaultTab,

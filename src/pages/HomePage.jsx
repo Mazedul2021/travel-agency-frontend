@@ -18,8 +18,8 @@ export default function HomePage() {
       <Hero />
       <SearchWidget />
       <FeaturesBar />
-      <TrustedWorldwide />
       <VisaSection />
+      <TrustedWorldwide />
       <TourPackages />
       <ServicesSection />
     </main>

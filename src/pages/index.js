@@ -1,3 +1,8 @@
 export { default as HomePage } from './HomePage'
 export { default as LoginPage } from './LoginPage'
 export { default as VisaPage } from './VisaPage'
+export { default as ContactPage } from './ContactPage'
+export { default as PartnerRegisterPage } from './PartnerRegisterPage'
+export { default as TourPackagePage } from './TourPackagePage'
+export { default as TourSearchResultsPage } from './TourSearchResultsPage'
+export { default as TourDetailPage } from './TourDetailPage'

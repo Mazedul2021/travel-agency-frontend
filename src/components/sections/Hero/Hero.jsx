@@ -74,8 +74,8 @@ export default function Hero() {
                 aria-pressed={index === active}
                 onClick={() => setActive(index)}
                 className={`relative z-20 h-2 rounded-full transition-all ${index === active
-                    ? 'w-7 bg-white'
-                    : 'w-2 bg-white/55 hover:bg-white/90'
+                  ? 'w-7 bg-white'
+                  : 'w-2 bg-white/55 hover:bg-white/90'
                   }`}
               />
             ))}
@@ -92,8 +92,8 @@ export default function Hero() {
               aria-label={`Show ${item.label} slide`}
               aria-pressed={index === active}
               className={`group relative h-28 overflow-hidden rounded-2xl border-2 shadow-xl transition ${index === active
-                  ? 'border-white'
-                  : 'border-white/50 hover:border-white'
+                ? 'border-white'
+                : 'border-white/50 hover:border-white'
                 }`}
             >
               <img

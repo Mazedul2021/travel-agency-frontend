@@ -5,7 +5,7 @@ import SectionLabel from './SectionLabel'
 // Placeholder until a real application form exists
 const APPLY_HREF = '#contact'
 
-export default function FeeCard({ countryName, type }) {
+export default function FeeCard({ countryName, type, onApply }) {
   const { title, fee, includes } = type.details
 
   return (
@@ -33,13 +33,14 @@ export default function FeeCard({ countryName, type }) {
         ))}
       </ul>
 
-      <a
-        href={APPLY_HREF}
-        className="mt-5 flex w-full items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-accent to-accent-dark px-5 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-accent/25 transition hover:-translate-y-0.5 hover:shadow-accent/40 active:scale-[0.99]"
+      <button
+        type="button"
+        onClick={onApply}
+        className="mt-5 flex w-full items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-accent to-accent-dark px-5 py-3.5 text-[15px] font-bold text-white shadow-lg shadow-accent/25 transition hover:-translate-y-0.5 hover:shadow-accent/40 active:scale-[0.99] cursor-pointer"
       >
         Apply for {countryName} {type.label}
         <ArrowRight className="size-[18px]" strokeWidth={2.5} />
-      </a>
+      </button>
     </div>
   )
 }

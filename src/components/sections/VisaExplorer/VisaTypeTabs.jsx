@@ -44,19 +44,17 @@ export default function VisaTypeTabs({ types, activeId, onSelect }) {
             tabIndex={isActive ? 0 : -1}
             onClick={() => onSelect(type.id)}
             onKeyDown={(event) => handleKeyDown(event, index)}
-            className={`rounded-xl border px-5 py-4 text-left transition-all ${
-              isActive
+            className={`rounded-xl border px-5 py-4 text-left transition-all ${isActive
                 ? 'border-navy bg-navy text-white shadow-lg shadow-navy/20'
                 : 'border-slate-200 bg-white text-navy shadow-sm hover:-translate-y-0.5 hover:border-primary hover:shadow-card'
-            }`}
+              }`}
           >
             <span className="block text-[15px] font-bold leading-snug">{type.label}</span>
             <span
-              className={`mt-1 block text-[13px] leading-snug ${
-                isActive ? 'text-white/80' : 'text-body'
-              }`}
+              className={`mt-1 block text-[13px] leading-snug ${isActive ? 'text-white/80' : 'text-body'
+                }`}
             >
-              {type.tagline}
+
             </span>
           </button>
         )

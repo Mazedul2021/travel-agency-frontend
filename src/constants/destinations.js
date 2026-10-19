@@ -20,7 +20,7 @@ export const IMAGES = {
 export const HERO_SLIDES = [
   {
     label: 'China Visa',
-    image: '/images/hero-china.webp',
+    image: 'https://r4.wallpaperflare.com/wallpaper/1000/732/59/spring-8k-uhd-8k-asia-wallpaper-537b330d7da97bf5cf764237b8cbd888.jpg',
     eyebrow: 'Discover',
     title: 'China & Beyond',
     description:
@@ -29,7 +29,7 @@ export const HERO_SLIDES = [
   },
   {
     label: 'Tour Packages',
-    image: '/images/hero-beach.webp',
+    image: 'https://r4.wallpaperflare.com/wallpaper/679/593/166/canal-architecture-tourism-water-wallpaper-592068ad61fa9d4b2617384f0081a65d.jpg',
     eyebrow: 'Explore',
     title: 'Journeys That Inspire',
     description:
@@ -38,7 +38,7 @@ export const HERO_SLIDES = [
   },
   {
     label: 'Explore Bangladesh',
-    image: '/images/hero-lake.webp',
+    image: 'https://r4.wallpaperflare.com/wallpaper/631/683/713/nature-bridge-sky-city-wallpaper-7980180df11add3bc617f84fb001566d.jpg',
     eyebrow: 'Experience',
     title: 'Find Your Somewhere',
     description:
