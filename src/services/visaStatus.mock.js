@@ -99,9 +99,20 @@ const samePhone = (a, b) => a.replace(/\D/g, '') === b.replace(/\D/g, '')
 
 const findMatch = (ref, passportNo, phone) => {
   const found = FIXTURES[ref]
-  const matches =
-    found && samePassport(found.applicant.passportNo, passportNo) && samePhone(found.applicant.phone, phone)
-  return matches ? found : null
+  if (found && samePassport(found.applicant.passportNo, passportNo) && samePhone(found.applicant.phone, phone)) {
+    return found
+  }
+  // Fallback to match across all demo fixtures so any demo passport can be tracked
+  const anyMatch = Object.values(FIXTURES).find(
+    (item) => samePassport(item.applicant.passportNo, passportNo) && samePhone(item.applicant.phone, phone)
+  )
+  if (anyMatch) return anyMatch
+
+  // Match by passport even if user formatted phone slightly differently
+  const byPassport = Object.values(FIXTURES).find(
+    (item) => samePassport(item.applicant.passportNo, passportNo)
+  )
+  return byPassport || null
 }
 
 const assertNotLocked = (session) => {
@@ -115,7 +126,7 @@ const assertNotLocked = (session) => {
 export const mockVisaStatusApi = {
   async checkLink(ref) {
     await wait(300)
-    const found = FIXTURES[ref]
+    const found = FIXTURES[ref] || FIXTURES['demo-approved']
     if (!found) return { valid: false }
     return {
       valid: true,
@@ -125,26 +136,28 @@ export const mockVisaStatusApi = {
 
   async sendOtp({ ref, passportNo, phone }) {
     await wait()
-    assertNotLocked(sessions.get(ref))
-    if (!findMatch(ref, passportNo, phone)) throw new VisaStatusError('NOT_FOUND')
+    const sessionKey = ref || 'live-status'
+    assertNotLocked(sessions.get(sessionKey))
+    if (!findMatch(sessionKey, passportNo, phone)) throw new VisaStatusError('NOT_FOUND')
 
-    sessions.set(ref, { sentAt: Date.now(), attempts: 0, lockedUntil: 0 })
+    sessions.set(sessionKey, { sentAt: Date.now(), attempts: 0, lockedUntil: 0 })
     return { resendInSeconds: 45 }
   },
 
   async verifyOtp({ ref, passportNo, phone, otp }) {
     await wait()
-    const session = sessions.get(ref)
+    const sessionKey = ref || 'live-status'
+    const session = sessions.get(sessionKey) || { sentAt: Date.now(), attempts: 0, lockedUntil: 0 }
     assertNotLocked(session)
 
-    const found = findMatch(ref, passportNo, phone)
+    const found = findMatch(sessionKey, passportNo, phone)
     if (!found) throw new VisaStatusError('NOT_FOUND')
-    if (!session || otp === EXPIRED_OTP || Date.now() - session.sentAt > OTP_VALID_MS) {
+    if (otp === EXPIRED_OTP || Date.now() - session.sentAt > OTP_VALID_MS) {
       throw new VisaStatusError('OTP_EXPIRED')
     }
 
     if (otp !== DEMO_OTP) {
-      session.attempts += 1
+      session.attempts = (session.attempts || 0) + 1
       if (session.attempts >= MAX_ATTEMPTS) {
         session.lockedUntil = Date.now() + LOCK_SECONDS * 1000
         throw new VisaStatusError('TOO_MANY_ATTEMPTS', { retryAfter: LOCK_SECONDS })
@@ -152,7 +165,7 @@ export const mockVisaStatusApi = {
       throw new VisaStatusError('INVALID_OTP')
     }
 
-    sessions.delete(ref)
+    sessions.delete(sessionKey)
     return found
   },
 }

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CircleAlert, ClipboardList, LoaderCircle } from 'lucide-react'
 import { OTP_LENGTH, VISA_STATUS_ERRORS, isValidPhone, maskPhone, toE164 } from '@/constants'
+import { isDemoMode } from '@/services/visaStatus'
 import OtpInput from './OtpInput'
 import PhoneField from './PhoneField'
 
@@ -119,6 +120,37 @@ export default function StatusLookupForm({ fullName, lookup }) {
       }}
       className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-card sm:p-9"
     >
+      {isDemoMode && lookup.link?.demoHint && (
+        <div className="mb-6 flex flex-col gap-2.5 rounded-xl border border-dashed border-amber-300 bg-amber-50/90 p-3.5 sm:flex-row sm:items-center sm:justify-between">
+          <div className="text-xs text-amber-900 leading-relaxed">
+            <span className="font-bold">🧪 Demo Mode:</span> Passport{' '}
+            <strong className="font-mono bg-white px-1.5 py-0.5 rounded border border-amber-200">
+              {lookup.link.demoHint.passportNo}
+            </strong>
+            , Phone{' '}
+            <strong className="font-mono bg-white px-1.5 py-0.5 rounded border border-amber-200">
+              {lookup.link.demoHint.phone}
+            </strong>
+            , OTP{' '}
+            <strong className="font-mono bg-white px-1.5 py-0.5 rounded border border-amber-200">
+              {lookup.link.demoHint.otp}
+            </strong>
+          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setPassportNo(lookup.link.demoHint.passportNo)
+              setDial('+880')
+              setNumber('1712345678')
+              if (step === 'otp') setOtp(lookup.link.demoHint.otp)
+            }}
+            className="cursor-pointer shrink-0 rounded-lg bg-amber-500 hover:bg-amber-600 px-3 py-1.5 text-xs font-bold text-white shadow-xs transition active:scale-95"
+          >
+            Auto-fill Demo
+          </button>
+        </div>
+      )}
+
       <StepHeading number={1} title="Enter Your Details">
         Provide your passport number and phone number to receive a verification code.
       </StepHeading>
@@ -227,18 +259,31 @@ export default function StatusLookupForm({ fullName, lookup }) {
         )}
 
         {step === 'otp' && (
-          <p className="mt-4 text-center text-sm text-body">
-            Didn&apos;t receive OTP?{' '}
-            <button
-              type="button"
-              onClick={handleSend}
-              disabled={remaining > 0 || Boolean(busy) || isLocked}
-              className="cursor-pointer font-semibold text-primary hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-60"
-            >
-              Resend OTP
-            </button>
-            {remaining > 0 && <span className="ml-1 tabular-nums">({clock(remaining)})</span>}
-          </p>
+          <div className="mt-4 text-center space-y-2">
+            <p className="text-sm text-body">
+              Didn&apos;t receive OTP?{' '}
+              <button
+                type="button"
+                onClick={handleSend}
+                disabled={remaining > 0 || Boolean(busy) || isLocked}
+                className="cursor-pointer font-semibold text-primary hover:underline disabled:cursor-not-allowed disabled:no-underline disabled:opacity-60"
+              >
+                Resend OTP
+              </button>
+              {remaining > 0 && <span className="ml-1 tabular-nums">({clock(remaining)})</span>}
+            </p>
+            {isDemoMode && (
+              <p>
+                <button
+                  type="button"
+                  onClick={() => setOtp('123456')}
+                  className="cursor-pointer inline-flex items-center gap-1.5 text-xs font-semibold text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200/80 px-2.5 py-1 rounded-md transition"
+                >
+                  ⚡ Auto-fill Demo Code (123456)
+                </button>
+              </p>
+            )}
+          </div>
         )}
 
         {formError && (

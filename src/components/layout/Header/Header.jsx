@@ -370,6 +370,12 @@ export default function Header({
       } else if (link.label === 'Contact Us') {
         href = '/contact'
         active = isContactPage
+      } else if (link.label === 'Gallery') {
+        href = '/gallery'
+        active = location?.pathname === '/gallery'
+      } else if (link.label === 'Tour Packages') {
+        href = '/tour-packages'
+        active = location?.pathname?.startsWith('/tour-packages')
       } else if (link.label === 'Home') {
         href = '/'
         active = isHomePage && (!activeHref || activeHref === '/' || activeHref === '#home')
@@ -387,7 +393,6 @@ export default function Header({
         ...link,
         href,
         active,
-        hasDropdown: Boolean(link.hasDropdown),
       }
     })
 
@@ -417,9 +422,6 @@ export default function Header({
                 }`}
             >
               <span>{link.label}</span>
-              {link.hasDropdown && (
-                <ChevronDown className="size-3.5 text-slate-500 group-hover:text-[#0a5ec0] transition-transform duration-200" />
-              )}
 
               <span
                 aria-hidden="true"
@@ -471,45 +473,7 @@ export default function Header({
             )}
           </div>
 
-          {/* 2. Language Selector with Globe */}
-          <div className="relative" ref={langWrapRef}>
-            <button
-              type="button"
-              onClick={() => setLangMenuOpen((prev) => !prev)}
-              className="flex items-center gap-1.5 text-[14px] font-medium text-slate-700 hover:text-[#0d81f0] transition-colors cursor-pointer select-none"
-            >
-              <Globe className="size-[18px] text-slate-700" />
-              <span className="font-semibold text-xs tracking-wide">{currentLang}</span>
-              <ChevronDown className={`size-3.5 text-slate-600 transition-transform duration-200 ${langMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
 
-            {langMenuOpen && (
-              <div className="absolute right-0 top-full mt-2 w-28 rounded-xl border border-slate-100 bg-white py-1.5 shadow-lg z-50 animate-fade-in text-xs font-semibold text-slate-700">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrentLang('EN')
-                    setLangMenuOpen(false)
-                  }}
-                  className={`w-full px-3 py-1.5 text-left hover:bg-blue-50 hover:text-[#0d81f0] flex items-center justify-between ${currentLang === 'EN' ? 'text-[#0d81f0] font-bold' : ''}`}
-                >
-                  <span>EN</span>
-                  {currentLang === 'EN' && <span>✓</span>}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrentLang('BN')
-                    setLangMenuOpen(false)
-                  }}
-                  className={`w-full px-3 py-1.5 text-left hover:bg-blue-50 hover:text-[#0d81f0] flex items-center justify-between ${currentLang === 'BN' ? 'text-[#0d81f0] font-bold' : ''}`}
-                >
-                  <span>BN</span>
-                  {currentLang === 'BN' && <span>✓</span>}
-                </button>
-              </div>
-            )}
-          </div>
 
           {/* 3. User Profile Dropdown Trigger & Dropdown Modal */}
           {isAuthenticated ? (

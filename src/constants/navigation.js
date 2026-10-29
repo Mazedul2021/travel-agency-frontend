@@ -2,32 +2,12 @@
  * Navigation and Link Constants for ABL Travels
  */
 
-// Menu order matches the design: Home, Visa, Tour Packages, Destinations,
-// B2B Partner, About Us, Contact Us.
-// `children` (optional) = dropdown items. `hasDropdown` mirrors it so the
-// existing Header can keep using the flag to show the chevron.
+// Menu order: Home, Visa, Tour Packages, Gallery, About Us, Contact Us.
 export const NAV_LINKS = [
   { label: 'Home', href: '/' },
-  {
-    label: 'Visa',
-    href: '/visa',
-    hasDropdown: true,
-    children: [
-      { label: 'Visa Services', href: '/visa' },
-      { label: 'Visa Gallery', href: '/gallery#visa-gallery' },
-    ],
-  },
-  {
-    label: 'Tour Packages',
-    href: '/tour-packages',
-    hasDropdown: true,
-    children: [
-      { label: 'All Packages', href: '/tour-packages' },
-      { label: 'Tour Gallery', href: '/gallery#tour-gallery' },
-    ],
-  },
-  { label: 'Destinations', href: '/tour-packages' },
-  { label: 'B2B Partner', href: '/b2b' },
+  { label: 'Visa', href: '/visa' },
+  { label: 'Tour Packages', href: '/tour-packages' },
+  { label: 'Gallery', href: '/gallery' },
   { label: 'About Us', href: '/#about' },
   { label: 'Contact Us', href: '/contact' },
 ]

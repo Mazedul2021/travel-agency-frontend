@@ -32,6 +32,35 @@ import Breadcrumb from '@/components/common/Breadcrumb'
 import { DELHI_TOUR_DATA } from '@/data/delhiTourData'
 import CustomTourBuilderModal from '@/components/tour-packages/CustomTourBuilderModal'
 
+function formatTourDate(isoDate) {
+  if (!isoDate) return 'Select date'
+  try {
+    const [year, month, day] = isoDate.split('-').map(Number)
+    const date = new Date(year, month - 1, day)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const tomorrow = new Date(today)
+    tomorrow.setDate(tomorrow.getDate() + 1)
+
+    const dateZero = new Date(date)
+    dateZero.setHours(0, 0, 0, 0)
+
+    const isToday = dateZero.getTime() === today.getTime()
+    const isTomorrow = dateZero.getTime() === tomorrow.getTime()
+
+    const dayName = date.toLocaleDateString('en-US', { weekday: 'short' })
+    const monthName = date.toLocaleDateString('en-US', { month: 'short' })
+    const dayNum = date.getDate()
+    const yearNum = date.getFullYear()
+
+    if (isToday) return `Today, ${monthName} ${dayNum}, ${yearNum}`
+    if (isTomorrow) return `Tomorrow, ${monthName} ${dayNum}, ${yearNum}`
+    return `${dayName}, ${monthName} ${dayNum}, ${yearNum}`
+  } catch {
+    return isoDate
+  }
+}
+
 export default function TourDetailPage() {
   const navigate = useNavigate()
   const { slug } = useParams()
@@ -44,9 +73,12 @@ export default function TourDetailPage() {
   const [activePhotoIndex, setActivePhotoIndex] = useState(0)
   const [selectedOption, setSelectedOption] = useState('opt-all-inclusive')
   const [selectedLanguage, setSelectedLanguage] = useState('English')
-  const [selectedTime, setSelectedTime] = useState('09:00 AM')
   const [adults, setAdults] = useState(2)
   const [childrenCount, setChildrenCount] = useState(0)
+  const [infantsCount, setInfantsCount] = useState(0)
+  const [isParticipantsOpen, setIsParticipantsOpen] = useState(false)
+  const participantsDropdownRef = useRef(null)
+  const dateInputRef = useRef(null)
   const [selectedDate, setSelectedDate] = useState(() => {
     const d = new Date()
     d.setDate(d.getDate() + 1)
@@ -60,6 +92,20 @@ export default function TourDetailPage() {
   const [bookingRef, setBookingRef] = useState('DEL-849201')
   const [showAllReviews, setShowAllReviews] = useState(false)
   const [showCustomTourModal, setShowCustomTourModal] = useState(false)
+
+  // Close participants dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        participantsDropdownRef.current &&
+        !participantsDropdownRef.current.contains(event.target)
+      ) {
+        setIsParticipantsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   // Scroll to top on mount
   useEffect(() => {
@@ -103,8 +149,14 @@ export default function TourDetailPage() {
   const adultPrice = activeOptionObj.price
   const childPrice = Math.round(activeOptionObj.price * 0.65)
   const totalPrice = adults * adultPrice + childrenCount * childPrice
-
-  // Handle Share
+  const totalGuests = adults + childrenCount + infantsCount
+  const participantsSummary = [
+    `${adults} ${adults === 1 ? 'Adult' : 'Adults'}`,
+    childrenCount > 0 ? `${childrenCount} ${childrenCount === 1 ? 'Child' : 'Children'}` : null,
+    infantsCount > 0 ? `${infantsCount} ${infantsCount === 1 ? 'Infant' : 'Infants'}` : null,
+  ]
+    .filter(Boolean)
+    .join(', ')
   const handleShare = async () => {
     const url = window.location.href
     if (navigator.share) {
@@ -927,56 +979,260 @@ export default function TourDetailPage() {
                 </div>
 
                 {/* ── Pickers ── */}
-                <div className="space-y-2.5">
+                <div className="space-y-3">
 
-                  {/* People Picker */}
-                  <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 hover:border-slate-300 transition-colors">
-                    <Users className="w-4 h-4 text-slate-500 shrink-0" />
-                    <div className="flex-1 flex items-center justify-between gap-2">
-                      <div className="min-w-0">
-                        <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Participants</span>
-                        <span className="text-xs font-bold text-slate-800">
-                          Adult × {adults}{childrenCount > 0 ? `, Child × ${childrenCount}` : ''}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        {/* Adults */}
-                        <div className="flex items-center gap-1">
-                          <button type="button" onClick={() => setAdults((p) => Math.max(1, p - 1))} disabled={adults <= 1}
-                            className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-40 text-sm font-bold cursor-pointer">−</button>
-                          <span className="w-4 text-center text-xs font-bold text-slate-800">{adults}</span>
-                          <button type="button" onClick={() => setAdults((p) => p + 1)}
-                            className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 text-sm font-bold cursor-pointer">+</button>
+                  {/* 1. Participants Dropdown */}
+                  <div className="relative" ref={participantsDropdownRef}>
+                    <button
+                      type="button"
+                      id="participants-dropdown-btn"
+                      onClick={() => setIsParticipantsOpen((prev) => !prev)}
+                      aria-expanded={isParticipantsOpen}
+                      className={`w-full flex items-center justify-between gap-3 rounded-xl border px-3.5 py-2.5 transition-all text-left cursor-pointer shadow-2xs ${
+                        isParticipantsOpen
+                          ? 'border-blue-500 bg-blue-50/40 ring-2 ring-blue-500/10'
+                          : 'border-slate-200 bg-slate-50/60 hover:border-blue-400 hover:bg-blue-50/20'
+                      }`}
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div
+                          className={`size-8 rounded-lg flex items-center justify-center shrink-0 transition-colors ${
+                            isParticipantsOpen ? 'bg-blue-600 text-white' : 'bg-blue-50 text-blue-600'
+                          }`}
+                        >
+                          <Users className="w-4 h-4" />
                         </div>
-                        <div className="w-px h-4 bg-slate-200" />
-                        {/* Children */}
-                        <div className="flex items-center gap-1">
-                          <button type="button" onClick={() => setChildrenCount((p) => Math.max(0, p - 1))} disabled={childrenCount <= 0}
-                            className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-40 text-sm font-bold cursor-pointer">−</button>
-                          <span className="w-4 text-center text-xs font-bold text-slate-500">{childrenCount}</span>
-                          <button type="button" onClick={() => setChildrenCount((p) => p + 1)}
-                            className="flex h-6 w-6 items-center justify-center rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 text-sm font-bold cursor-pointer">+</button>
+                        <div className="min-w-0">
+                          <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Participants ({totalGuests})
+                          </span>
+                          <span className="block text-xs sm:text-[13px] font-bold text-slate-900 truncate">
+                            {participantsSummary}
+                          </span>
                         </div>
                       </div>
-                    </div>
-                  </div>
-
-                  {/* Date Picker */}
-                  <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 hover:border-slate-300 transition-colors">
-                    <CalendarCheck className="w-4 h-4 text-slate-500 shrink-0" />
-                    <div className="flex-1">
-                      <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">Select date</span>
-                      <input
-                        type="date"
-                        value={selectedDate}
-                        min={minDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        className="w-full bg-transparent text-xs font-bold text-slate-800 focus:outline-none cursor-pointer"
+                      <ChevronDown
+                        className={`w-4 h-4 text-slate-400 shrink-0 transition-transform duration-200 ${
+                          isParticipantsOpen ? 'rotate-180 text-blue-600' : ''
+                        }`}
                       />
+                    </button>
+
+                    {/* Dropdown Menu Panel */}
+                    {isParticipantsOpen && (
+                      <div className="absolute top-full left-0 right-0 mt-2 z-30 rounded-2xl border border-slate-200/90 bg-white p-4 shadow-2xl space-y-3.5 animate-fade-in">
+                        {/* Adult (Age 12-99) */}
+                        <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-bold text-slate-900">Adult</span>
+                              <span className="text-[11px] font-semibold text-slate-500">(Age 12-99)</span>
+                            </div>
+                            <span className="text-xs font-semibold text-blue-600">
+                              ${adultPrice} / person
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2.5">
+                            <button
+                              type="button"
+                              onClick={() => setAdults((prev) => Math.max(1, prev - 1))}
+                              disabled={adults <= 1}
+                              aria-label="Decrease adults"
+                              className="size-8 rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold text-base transition-colors cursor-pointer"
+                            >
+                              −
+                            </button>
+                            <span className="w-5 text-center text-sm font-bold text-slate-900">
+                              {adults}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setAdults((prev) => Math.min(20, prev + 1))}
+                              disabled={adults >= 20}
+                              aria-label="Increase adults"
+                              className="size-8 rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold text-base transition-colors cursor-pointer"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Child (Age 3-11) */}
+                        <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-bold text-slate-900">Child</span>
+                              <span className="text-[11px] font-semibold text-slate-500">(Age 3-11)</span>
+                            </div>
+                            <span className="text-xs font-semibold text-blue-600">
+                              ${childPrice} / person
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2.5">
+                            <button
+                              type="button"
+                              onClick={() => setChildrenCount((prev) => Math.max(0, prev - 1))}
+                              disabled={childrenCount <= 0}
+                              aria-label="Decrease children"
+                              className="size-8 rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold text-base transition-colors cursor-pointer"
+                            >
+                              −
+                            </button>
+                            <span className="w-5 text-center text-sm font-bold text-slate-900">
+                              {childrenCount}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setChildrenCount((prev) => Math.min(10, prev + 1))}
+                              disabled={childrenCount >= 10}
+                              aria-label="Increase children"
+                              className="size-8 rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold text-base transition-colors cursor-pointer"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Infant (Age 2 and younger) */}
+                        <div className="flex items-center justify-between gap-2 pb-3 border-b border-slate-100">
+                          <div>
+                            <div className="flex items-center gap-1.5">
+                              <span className="text-sm font-bold text-slate-900">Infant</span>
+                              <span className="text-[11px] font-semibold text-slate-500">(Age 2 and younger)</span>
+                            </div>
+                            <span className="text-xs font-bold text-emerald-600">
+                              Free (on lap)
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-2.5">
+                            <button
+                              type="button"
+                              onClick={() => setInfantsCount((prev) => Math.max(0, prev - 1))}
+                              disabled={infantsCount <= 0}
+                              aria-label="Decrease infants"
+                              className="size-8 rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold text-base transition-colors cursor-pointer"
+                            >
+                              −
+                            </button>
+                            <span className="w-5 text-center text-sm font-bold text-slate-900">
+                              {infantsCount}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => setInfantsCount((prev) => Math.min(5, prev + 1))}
+                              disabled={infantsCount >= 5}
+                              aria-label="Increase infants"
+                              className="size-8 rounded-full border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center font-bold text-base transition-colors cursor-pointer"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Done Button */}
+                        <div className="pt-1 flex items-center justify-between">
+                          <span className="text-[11px] text-slate-400 font-medium">
+                            {totalGuests} total {totalGuests === 1 ? 'guest' : 'guests'}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setIsParticipantsOpen(false)}
+                            className="rounded-xl bg-blue-600 hover:bg-blue-700 px-4 py-1.5 text-xs font-bold text-white shadow-xs transition active:scale-95 cursor-pointer"
+                          >
+                            Done
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* 2. Date Button */}
+                  <div>
+                    <button
+                      type="button"
+                      id="tour-date-btn"
+                      onClick={() => {
+                        if (dateInputRef.current) {
+                          if (typeof dateInputRef.current.showPicker === 'function') {
+                            dateInputRef.current.showPicker()
+                          } else {
+                            dateInputRef.current.focus()
+                            dateInputRef.current.click()
+                          }
+                        }
+                      }}
+                      className="w-full flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 hover:border-blue-400 hover:bg-blue-50/20 transition-all text-left cursor-pointer group shadow-2xs"
+                    >
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="size-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center shrink-0 group-hover:bg-blue-100 transition-colors">
+                          <CalendarCheck className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                            Select date
+                          </span>
+                          <span className="block text-xs sm:text-[13px] font-bold text-slate-900 truncate">
+                            {formatTourDate(selectedDate)}
+                          </span>
+                        </div>
+                      </div>
+                      <span className="shrink-0 text-[11px] font-bold text-blue-600 bg-white border border-blue-200 px-2.5 py-1 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-all shadow-2xs">
+                        Change
+                      </span>
+                    </button>
+                    <input
+                      ref={dateInputRef}
+                      type="date"
+                      value={selectedDate}
+                      min={minDate}
+                      onChange={(e) => setSelectedDate(e.target.value)}
+                      className="sr-only"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                    />
+
+                    {/* Quick date shortcuts */}
+                    <div className="flex items-center gap-1.5 pt-1.5 px-0.5">
+                      <span className="text-[10px] font-semibold text-slate-400">Quick:</span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const d = new Date()
+                          d.setDate(d.getDate() + 1)
+                          setSelectedDate(d.toISOString().split('T')[0])
+                        }}
+                        className="text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 px-2 py-0.5 rounded-md transition cursor-pointer"
+                      >
+                        Tomorrow
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const d = new Date()
+                          d.setDate(d.getDate() + 2)
+                          setSelectedDate(d.toISOString().split('T')[0])
+                        }}
+                        className="text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 px-2 py-0.5 rounded-md transition cursor-pointer"
+                      >
+                        +2 Days
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const d = new Date()
+                          const day = d.getDay()
+                          const diff = (6 - day + 7) % 7 || 7
+                          d.setDate(d.getDate() + diff)
+                          setSelectedDate(d.toISOString().split('T')[0])
+                        }}
+                        className="text-[10px] font-bold text-slate-600 bg-slate-100 hover:bg-blue-50 hover:text-blue-600 px-2 py-0.5 rounded-md transition cursor-pointer"
+                      >
+                        This Weekend
+                      </button>
                     </div>
                   </div>
 
-                  {/* Language Picker */}
+                  {/* 3. Language Picker */}
                   <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50/60 px-3.5 py-2.5 hover:border-slate-300 transition-colors">
                     <Flag className="w-4 h-4 text-slate-500 shrink-0" />
                     <div className="flex-1">
@@ -992,22 +1248,6 @@ export default function TourDetailPage() {
                       </select>
                     </div>
                   </div>
-
-                  {/* Starting Time */}
-                  <div>
-                    <span className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5 px-0.5">Starting time</span>
-                    <div className="grid grid-cols-3 gap-2">
-                      {['08:00 AM', '09:00 AM', '10:00 AM'].map((time) => (
-                        <button key={time} type="button" onClick={() => setSelectedTime(time)}
-                          className={`rounded-lg border py-2 text-xs font-bold transition-all cursor-pointer ${
-                            selectedTime === time
-                              ? 'border-[#1a2b4c] bg-[#1a2b4c] text-white shadow-sm'
-                              : 'border-slate-200 bg-white text-slate-700 hover:border-slate-300'
-                          }`}
-                        >{time}</button>
-                      ))}
-                    </div>
-                  </div>
                 </div>
 
                 {/* ── Price Summary ── */}
@@ -1020,6 +1260,12 @@ export default function TourDetailPage() {
                     <div className="flex justify-between text-slate-600">
                       <span>{childrenCount} {childrenCount === 1 ? 'Child' : 'Children'} × ${childPrice}</span>
                       <span className="font-semibold text-slate-900">${childrenCount * childPrice}</span>
+                    </div>
+                  )}
+                  {infantsCount > 0 && (
+                    <div className="flex justify-between text-slate-600">
+                      <span>{infantsCount} {infantsCount === 1 ? 'Infant' : 'Infants'} (Age 2 and younger)</span>
+                      <span className="font-bold text-emerald-600">FREE</span>
                     </div>
                   )}
                   <div className="flex justify-between text-slate-600">
@@ -1280,9 +1526,9 @@ export default function TourDetailPage() {
                 <span className="font-semibold text-slate-800">{activeOptionObj.name}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Date & Starting Time:</span>
+                <span className="text-slate-500">Travel Date:</span>
                 <span className="font-semibold text-slate-800">
-                  {selectedDate} at {selectedTime}
+                  {formatTourDate(selectedDate)}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -1291,9 +1537,10 @@ export default function TourDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">Guests:</span>
-                <span className="font-semibold text-slate-800">
+                <span className="font-semibold text-slate-800 text-right">
                   {adults} {adults === 1 ? 'Adult' : 'Adults'}
-                  {childrenCount > 0 ? `, ${childrenCount} Children` : ''}
+                  {childrenCount > 0 ? `, ${childrenCount} ${childrenCount === 1 ? 'Child' : 'Children'}` : ''}
+                  {infantsCount > 0 ? `, ${infantsCount} ${infantsCount === 1 ? 'Infant' : 'Infants'}` : ''}
                 </span>
               </div>
               <div className="flex justify-between pt-2 border-t border-slate-200 items-baseline">
@@ -1351,6 +1598,7 @@ export default function TourDetailPage() {
       <CustomTourBuilderModal
         isOpen={showCustomTourModal}
         onClose={() => setShowCustomTourModal(false)}
+        currentTour={tour}
       />
     </div>
   )
